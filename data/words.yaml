@@ -59,7 +59,7 @@ subjects:
       - name: OCR H446
         topics:
           - code: 1.1.1
-            name: Structure and function of the processors
+            name: Structure and function of processors
           - code: 1.1.2
             name: Types of processor
           - code: 1.1.3
