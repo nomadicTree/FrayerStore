@@ -99,22 +99,34 @@ def concise_html_list(list):
 
 
 def display_frayer_model(word_row, include_courses=False, show_topics=False):
-    st.subheader(word_row["word"])
+    word = word_row["word"]
+    definition = word_row["definition"]
     characteristics = json.loads(word_row["characteristics"])
     examples = json.loads(word_row["examples"])
     non_examples = json.loads(word_row["non_examples"])
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"**Definition:**")
-        st.markdown(f"{word_row['definition']}")
-        st.markdown("**Characteristics:**")
-        st.markdown(concise_html_list(characteristics), unsafe_allow_html=True)
-    with col2:
-        st.markdown("**Examples:**")
-        st.markdown(concise_html_list(examples), unsafe_allow_html=True)
-        st.markdown("**Non-Examples:**")
-        st.markdown(concise_html_list(non_examples), unsafe_allow_html=True)
+    st.subheader(word)
+    frayer_html = f"""
+    <div class="frayer-grid">
+        <div class="frayer-cell">
+            <div class="frayer-title">Definition</div>
+            {definition}
+        </div>
+        <div class="frayer-cell">
+            <div class="frayer-title">Characteristics</div>
+            <ul>{"".join(f"<li>{c}</li>" for c in characteristics)}</ul>
+        </div>
+        <div class="frayer-cell">
+            <div class="frayer-title">Examples</div>
+            <ul>{"".join(f"<li>{e}</li>" for e in examples)}</ul>
+        </div>
+        <div class="frayer-cell">
+            <div class="frayer-title">Non-Examples</div>
+            <ul>{"".join(f"<li>{n}</li>" for n in non_examples)}</ul>
+        </div>
+    </div>
+    """
+    st.markdown(frayer_html, unsafe_allow_html=True)
     if show_topics:
         st.divider()
         if include_courses:
@@ -160,9 +172,35 @@ def display_search_results(results, query):
         st.info("No results found.")
 
 
+def apply_styles():
+    css = """
+    <style>
+        .frayer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 2px solid #999;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+    .frayer-cell {
+        border: 1px solid #aaa;
+        padding: 12px 16px;
+        vertical-align: top;
+    }
+    .frayer-title {
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
 def main():
 
     st.title("Key words")
+    apply_styles()
 
     tab1, tab2 = st.tabs(["Search", "Glossary"])
     with tab1:
@@ -267,7 +305,6 @@ def main():
                 for w in words:
                     with st.expander(w["word"], expanded=False):
                         display_frayer_model(w)
-                        st.write("######")
             else:
                 st.info("No words found for this topic.")
 
