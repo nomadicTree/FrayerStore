@@ -1,10 +1,11 @@
 CREATE TABLE Word (
     id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL UNIQUE,
+    word TEXT NOT NULL,
+    subject_id INTEGER NOT NULL REFERENCES Subject(id),
     definition TEXT,
-    characteristics TEXT, -- JSON array
-    examples TEXT,        -- JSON array
-    non_examples TEXT     -- JSON array
+    characteristics TEXT,
+    examples TEXT,
+    non_examples TEXT
 );
 
 CREATE TABLE Subject (
