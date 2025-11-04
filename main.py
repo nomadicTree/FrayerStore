@@ -97,7 +97,7 @@ def display_multiple_results(results):
     for row in results:
         w = Word(row)
         with st.expander(f"{w.word} ({w.subject_name})", expanded=False):
-            w.display_frayer(show_topics=True)
+            w.display_frayer(include_subject_info=True, show_topics=True)
 
 
 def display_single_result(results):
