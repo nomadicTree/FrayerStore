@@ -109,7 +109,7 @@ subjects:
 
 words:
   - word: Register
-    definition: Small, fast CPU storage used temporarily store data.
+    definition: Small, fast storage location within the CPU.
     characteristics:
       - Stores a single memory address, instruction, or datum
       - Used in the Fetch-Decode-Execute (FDE) cycle
