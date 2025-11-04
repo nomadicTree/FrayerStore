@@ -91,54 +91,71 @@ def get_all_subjects_courses_topics():
     return results
 
 
-def display_frayer_model(word_row):
-    word = word_row["word"]
-    st.subheader(word_row["word"])
+def concise_html_list(list):
+    list_html = f"""<ul style="margin:0; padding-left:20px;">
+        {''.join(f'<li>{i}</li>' for i in list)}
+    </ul>"""
+    return list_html
+
+
+def display_frayer_model(word_row, header_override=None, show_topics=False):
+    if header_override:
+        st.subheader(header_override)
+    else:
+        st.subheader(word_row["word"])
     characteristics = json.loads(word_row["characteristics"])
     examples = json.loads(word_row["examples"])
     non_examples = json.loads(word_row["non_examples"])
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"**Definition:**\n{word_row['definition']}")
+        st.markdown(f"**Definition:**")
+        st.markdown(f"{word_row['definition']}")
         st.markdown("**Characteristics:**")
-        characteristics_html = f"""<ul style="margin:0; padding-left:20px;">
-            {''.join(f'<li>{c}</li>' for c in characteristics)}
-        </ul>"""
-        st.markdown(characteristics_html, unsafe_allow_html=True)
+        st.markdown(concise_html_list(characteristics), unsafe_allow_html=True)
     with col2:
         st.markdown("**Examples:**")
-        examples_html = f"""<ul style="margin:0; padding-left:20px;">
-            {''.join(f'<li>{e}</li>' for e in examples)}
-        </ul>"""
-        st.markdown(examples_html, unsafe_allow_html=True)
+        st.markdown(concise_html_list(examples), unsafe_allow_html=True)
         st.markdown("**Non-Examples:**")
-        non_examples_html = f"""<ul style="margin:0; padding-left:20px;">
-            {''.join(f'<li>{n}</li>' for n in non_examples)}
-        </ul>"""
-        st.markdown(non_examples_html, unsafe_allow_html=True)
+        st.markdown(concise_html_list(non_examples), unsafe_allow_html=True)
+    if show_topics:
+        st.divider()
+        topics = word_row["topics"]
+        if topics:
+            topics_list = topics.split(",")
+            st.markdown("**Topics:**")
+            st.markdown(concise_html_list(topics_list), unsafe_allow_html=True)
+            st.write("######")
+
+
+def display_multiple_results(results):
+    for w in results:
+        courses = w["courses"]
+        if courses:
+            courses_list = courses.split(",")
+            courses = ", ".join(courses_list)
+        else:
+            courses = ""
+        with st.expander(f"{w['word']} ({courses})", expanded=False):
+            display_frayer_model(w, show_topics=True)
+
+
+def display_single_result(results):
+    w = results[0]
+    courses = w["courses"]
+    if courses:
+        courses_list = courses.split(",")
+        courses = ", ".join(courses_list)
+    header = f"{w['word']} ({courses})"
+    display_frayer_model(w, header_override=header, show_topics=True)
 
 
 def display_search_results(results, query):
     if results:
-        for w in results:
-            courses = w["courses"]
-            if courses:
-                courses_list = courses.split(",")
-                courses = ", ".join(courses_list)
-            else:
-                courses = ""
-            with st.expander(f"{w['word']} ({courses})", expanded=False):
-                display_frayer_model(w)
-                st.divider()
-                topics = w["topics"]
-                if topics:
-                    topics_list = topics.split(",")
-                    st.markdown("**Topics:**")
-                    topics_html = f"""<ul style="margin:0; padding-left:20px;">
-                        {''.join(f'<li>{t}</li>' for t in topics_list)}
-                        </ul>"""
-                    st.markdown(topics_html, unsafe_allow_html=True)
+        if len(results) == 1:
+            display_single_result(results)
+        else:
+            display_multiple_results(results)
     elif query:
         st.info("No results found.")
 
@@ -250,6 +267,7 @@ def main():
                 for w in words:
                     with st.expander(w["word"], expanded=False):
                         display_frayer_model(w)
+                        st.write("######")
             else:
                 st.info("No words found for this topic.")
 
