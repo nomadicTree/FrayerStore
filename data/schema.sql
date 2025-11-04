@@ -32,4 +32,3 @@ CREATE TABLE WordTopic (
     topic_id INTEGER NOT NULL REFERENCES Topic(id) ON DELETE CASCADE,
     PRIMARY KEY(word_id, topic_id)
 );
-; 

@@ -1,5 +1,5 @@
 subjects:
-  - name: Computing Science
+  - name: Computer Science
     courses:
       - name: OCR J277
         topics:
@@ -133,9 +133,10 @@ words:
   - word: CPU
     definition: Central Processing Unit, the brain of the computer.
     characteristics:
-      - hardware
-      - executes instructions
-      - performs calculations
+      - Performs the Fetch-Decode-Execute (FDE) cycle
+      - Contains registers
+      - Executes instructions
+      - Performs calculations
     examples:
       - Intel i7
       - AMD Ryzen
@@ -151,15 +152,16 @@ words:
   - word: Secondary storage
     definition: Storage that retains data when the computer is powered off.
     characteristics:
-      - non-volatile
-      - high capacity
-      - slower than primary storage
+      - Non-volatile
+      - High capacity
+      - Slower than primary storage
     examples:
       - HDD
       - SSD
     non-examples:
       - Registers
       - Cache
+      - RAM
     topics:
       - course: OCR J277
         codes: [1.2.2]
