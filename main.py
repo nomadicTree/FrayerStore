@@ -16,47 +16,73 @@ def get_db_connection():
 def search_words(query):
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Fetch basic word info + subject
     cursor.execute(
         """
-        SELECT w.id,
-               w.word,
-               w.definition,
-               w.characteristics,
-               w.examples,
-               w.non_examples,
-               s.name AS subject_name,
-               
-               -- Distinct courses
-               (SELECT GROUP_CONCAT(DISTINCT c.name)
-                FROM WordTopic wt
-                JOIN Topic t ON wt.topic_id = t.id
-                JOIN Course c ON t.course_id = c.id
-                WHERE wt.word_id = w.id
-                ORDER BY c.name
-               ) AS courses,
-               
-               -- Distinct topics in format: code: name (course), sorted by course then code
-               (SELECT GROUP_CONCAT(topic_info, ', ')
-                FROM (
-                    SELECT DISTINCT t.code || ': ' || t.name || ' (' || c.name || ')' AS topic_info,
-                           c.name AS course_sort,
-                           t.code AS code_sort
-                    FROM WordTopic wt
-                    JOIN Topic t ON wt.topic_id = t.id
-                    JOIN Course c ON t.course_id = c.id
-                    WHERE wt.word_id = w.id
-                    ORDER BY course_sort, code_sort
-                )
-               ) AS topics
+        SELECT w.id, w.word, w.definition, w.characteristics, w.examples, w.non_examples,
+               s.name AS subject_name
         FROM Word w
         LEFT JOIN Subject s ON w.subject_id = s.id
         WHERE w.word LIKE ?
         """,
         (f"%{query}%",),
     )
-    results = cursor.fetchall()
+    words = cursor.fetchall()
+
+    word_results = []
+
+    for w in words:
+        word_id = w["id"]
+
+        # Fetch distinct courses
+        cursor.execute(
+            """
+            SELECT DISTINCT c.name AS course_name
+            FROM WordTopic wt
+            JOIN Topic t ON wt.topic_id = t.id
+            JOIN Course c ON t.course_id = c.id
+            WHERE wt.word_id = ?
+            ORDER BY c.name
+            """,
+            (word_id,),
+        )
+        courses_list = [row["course_name"] for row in cursor.fetchall()]
+        courses = "|| ".join(courses_list)
+
+        # Fetch distinct topics, format: code: name (course)
+        cursor.execute(
+            """
+            SELECT t.code || ': ' || t.name || ' (' || c.name || ')' AS topic_info
+            FROM WordTopic wt
+            JOIN Topic t ON wt.topic_id = t.id
+            JOIN Course c ON t.course_id = c.id
+            WHERE wt.word_id = ?
+            ORDER BY c.name, t.code
+            """,
+            (word_id,),
+        )
+        topics_list = [row["topic_info"] for row in cursor.fetchall()]
+        topics = "|| ".join(
+            topics_list
+        )  # use a separator that won't conflict with commas
+
+        word_results.append(
+            {
+                "id": word_id,
+                "word": w["word"],
+                "definition": w["definition"],
+                "characteristics": w["characteristics"],
+                "examples": w["examples"],
+                "non_examples": w["non_examples"],
+                "subject_name": w["subject_name"],
+                "courses": courses,
+                "topics": topics,
+            }
+        )
+
     conn.close()
-    return results
+    return word_results
 
 
 def get_words_by_topic(topic_id):
@@ -94,10 +120,18 @@ def get_all_subjects_courses_topics():
 
 
 def display_multiple_results(results):
+    # Group words by subject
+    subjects_dict = {}
     for row in results:
         w = Word(row)
-        with st.expander(f"{w.word} ({w.subject_name})", expanded=False):
-            w.display_frayer(include_subject_info=True, show_topics=True)
+        subjects_dict.setdefault(w.subject_name, []).append(w)
+
+    # Display results grouped by subject
+    for subject_name, words in subjects_dict.items():
+        st.subheader(subject_name)
+        for w in words:
+            with st.expander(f"{w.word}", expanded=False):
+                w.display_frayer(include_subject_info=True, show_topics=True)
 
 
 def display_single_result(results):

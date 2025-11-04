@@ -26,16 +26,18 @@ class Word:
             row["subject_name"] if "subject_name" in row.keys() else None
         )
         self.courses = (
-            row["courses"].split(",") if "courses" in row.keys() else ""
+            row["courses"].split("||") if "courses" in row.keys() else ""
         )
-        self.topics = row["topics"] if "topics" in row.keys() else ""
+
+        self.topics = (
+            row["topics"].split("||") if "topics" in row.keys() else ""
+        )
 
     def display_frayer(self, include_subject_info=False, show_topics=False):
         from main import concise_html_list
 
-        st.subheader(self.word)
         if include_subject_info:
-            st.write(f"{self.subject_name} ({", ".join(self.courses)})")
+            st.write(f"{", ".join(self.courses)}")
 
         frayer_html = f"""
         <div class="frayer-grid">
@@ -60,11 +62,9 @@ class Word:
         st.markdown(frayer_html, unsafe_allow_html=True)
 
         if show_topics:
-            st.divider()
             if self.topics:
-                topics_list = self.topics.split(",")
                 st.markdown("**Topics:**")
                 st.markdown(
-                    concise_html_list(topics_list), unsafe_allow_html=True
+                    concise_html_list(self.topics), unsafe_allow_html=True
                 )
                 st.write("######")
