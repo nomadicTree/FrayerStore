@@ -199,10 +199,10 @@ def apply_styles():
 
 def main():
 
-    st.title("Key words")
+    st.title("Frayer Dictionary")
     apply_styles()
-
-    tab1, tab2 = st.tabs(["Search", "Glossary"])
+    st.set_page_config(page_title="Frayer Dictionary")
+    tab1, tab2 = st.tabs(["Search", "By Topic"])
     with tab1:
         # Initialize session state for search
         if "search_query" not in st.session_state:
