@@ -8,6 +8,7 @@ from datetime import datetime
 DB_FILE = "data/words.db"
 SCHEMA_FILE = "data/schema.sql"
 YAML_FILE = "data/words.yaml"
+BACKUP_DIR = "data/backups"
 
 
 # -------------------------------
@@ -126,9 +127,17 @@ def create_db_if_not_exists(db_path, schema_path):
 
 def backup_db(db_path):
     os.makedirs(BACKUP_DIR, exist_ok=True)
-    backup_path = os.path.join(
-        BACKUP_DIR, f"words_backup_{os.path.getmtime(db_path)}.db"
-    )
+
+    # Current timestamp in YYYYMMDD_HHMMSS format
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Extract the base name of the DB file (e.g., 'words.db')
+    base_name = os.path.basename(db_path)
+
+    # Construct backup filename: words.db_YYYYMMDD_HHMMSS.bak
+    backup_filename = f"{base_name}_{timestamp}.bak"
+    backup_path = os.path.join(BACKUP_DIR, backup_filename)
+
     shutil.copy2(db_path, backup_path)
     print(f"Backup created: {backup_path}")
 
