@@ -1,5 +1,6 @@
-import json
 import streamlit as st
+import json
+import markdown
 
 
 def concise_html_list(list):
@@ -7,6 +8,18 @@ def concise_html_list(list):
         {''.join(f'<li>{i}</li>' for i in list)}
     </ul>"""
     return list_html
+
+
+def list_to_md(items):
+    """Convert a list of strings to a markdown bullet list."""
+    return "\n".join(f"- {item}" for item in items)
+
+
+def md_to_html(md_text):
+    """Convert markdown to HTML using python-markdown with useful extensions."""
+    # extensions 'extra' and 'sane_lists' help render lists/inline code well.
+    # If you expect raw HTML in the markdown and want to allow it, remove the html.escape() below.
+    return markdown.markdown(md_text, extensions=["extra", "sane_lists"])
 
 
 class Word:
@@ -52,15 +65,15 @@ class Word:
             </div>
             <div class="frayer-cell">
                 <div class="frayer-title">Characteristics</div>
-                <ul>{"".join(f"<li>{c}</li>" for c in self.characteristics)}</ul>
+                {md_to_html(list_to_md(self.characteristics))}
             </div>
             <div class="frayer-cell">
                 <div class="frayer-title">Examples</div>
-                <ul>{"".join(f"<li>{e}</li>" for e in self.examples)}</ul>
+                {md_to_html(list_to_md(self.examples))}
             </div>
             <div class="frayer-cell">
                 <div class="frayer-title">Non-Examples</div>
-                <ul>{"".join(f"<li>{n}</li>" for n in self.non_examples)}</ul>
+                {md_to_html(list_to_md(self.non_examples))}
             </div>
         </div>
         """
