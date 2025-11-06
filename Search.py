@@ -13,9 +13,11 @@ def search_query(query):
 
 def display_search_results(results, query):
     if results:
+        expand_results = len(results) < 3
         for word in results:
             with st.expander(
-                f"{word.word} – {word.subject_name}", expanded=False
+                f"{word.word} – {word.subject_name}",
+                expanded=expand_results,
             ):
                 word.display_frayer(
                     include_subject_info=True, show_topics=True
