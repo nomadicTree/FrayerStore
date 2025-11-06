@@ -170,7 +170,7 @@ words:
       - course: OCR H446
         codes: [1.1.3]
 
-  - word: Concatentaion
+  - word: Concatenation
     definition: Combining strings together end-to-end into a single string.
     characteristics:
       - Combines two or more strings into one new string
@@ -202,7 +202,7 @@ words:
       - 'int to bool: `bool(1)` &rarr; `True`'
     non-examples:
       - 'Assignment: `x = 5`'
-      - 'Concatentaion: `"hello " + "world"`'
+      - 'Concatenation: `"hello " + "world"`'
     topics:
       - course: OCR J277
         codes: [2.2.1]
