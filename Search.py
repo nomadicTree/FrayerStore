@@ -4,50 +4,48 @@ from app_lib.repositories import search_words
 
 
 def search_query(query):
-    word_rows = search_words(query)
+    rows = search_words(query)
     words = []
-    for r in word_rows:
-        words.append(Word(r))
+    for i in range(len(rows)):
+        words.append(Word(rows[i]))
     return words
 
 
 def display_search_results(results, query):
-    if results:
-        for word in results:
+    if len(results) > 0:
+        for i in range(len(results)):
+            word = results[i]
             with st.expander(
                 f"{word.word} – {word.subject_name}", expanded=False
             ):
                 word.display_frayer(
                     include_subject_info=True, show_topics=True
                 )
-    elif query:
+    elif len(query) > 0:
         st.info("No results found.")
 
 
 st.set_page_config(page_title="FrayerStore")
 st.title("Search")
 
-# Initialize session state for search
-if "search_query" not in st.session_state:
-    st.session_state.search_query = ""
-if "search_results" not in st.session_state:
-    st.session_state.search_results = []
+# --- Read query from URL ---
+params = st.query_params
+url_query = params.get("q", "")
 
-# Search input
-query = st.text_input(
-    "Search FrayerStore",
-    value=st.session_state.search_query,
-    key="search_input",
-).strip()
+# --- Text input for search ---
+input_value = st.text_input("Search FrayerStore", value=url_query).strip()
 
-# Perform search only if the query changed
-if query != st.session_state.search_query:
-    st.session_state.search_query = query
-    if query:
-        st.session_state.search_results = search_query(query)
+# --- If input differs from URL, update URL and stop to rerun ---
+if input_value != url_query:
+    if len(input_value) > 0:
+        st.query_params["q"] = input_value
     else:
-        st.session_state.search_results = []
+        st.query_params.clear()
+    st.stop()  # this triggers rerun with updated URL on next render
 
-# Display results
-results = st.session_state.search_results
-display_search_results(results, query)
+# --- Perform search if query exists ---
+results = []
+if len(url_query) > 0:
+    results = search_query(url_query)
+
+display_search_results(results, url_query)
