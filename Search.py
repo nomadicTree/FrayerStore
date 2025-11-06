@@ -31,17 +31,20 @@ def display_search_results(results, query):
 st.set_page_config(page_title="FrayerStore")
 st.title("Search")
 
-# --- Step 1: Read query from URL ---
-query = st.query_params.get("q", [""])[0]
+# --- Step 1: Get query from URL ---
+url_query = st.query_params.get("q", [""])[0]
 
-# --- Step 2: Search input controlled by URL ---
-query = st.text_input("Search FrayerStore", value=query).strip()
+# --- Step 2: Text input bound to local variable ---
+input_query = st.text_input("Search FrayerStore", value=url_query).strip()
 
-# --- Step 3: Update URL if input changed ---
-st.query_params = {"q": [query]}
+# --- Step 3: Only update URL if input changed ---
+if input_query != url_query:
+    st.query_params = {"q": [input_query]}  # triggers rerun
+    # On rerun, url_query will now equal input_query
 
-# --- Step 4: Run search ---
-results = search_query(query) if query else []
+# --- Step 4: Run search using current input_query (or url_query) ---
+search_term = st.query_params.get("q", [""])[0]  # safe to read again
+results = search_query(search_term) if search_term else []
 
 # --- Step 5: Display results ---
 for word in results:
