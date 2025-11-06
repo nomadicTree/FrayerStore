@@ -1,18 +1,14 @@
 import streamlit as st
+from app_lib.models import Word
 from app_lib.repositories import search_words
-
-
-@st.cache_data
-def get_word_object(row_dict):
-    # ensures Word() creation is cached per unique row
-    from app_lib.models import Word
-
-    return Word(row_dict)
 
 
 def search_query(query):
     word_rows = search_words(query)
-    return [get_word_object(dict(r)) for r in word_rows]
+    words = []
+    for r in word_rows:
+        words.append(Word(r))
+    return words
 
 
 def display_search_results(results, query):
@@ -31,22 +27,27 @@ def display_search_results(results, query):
 st.set_page_config(page_title="FrayerStore")
 st.title("Search")
 
-# --- Step 1: Get query from URL ---
-url_query = st.query_params.get("q", [""])[0]
+# Initialize session state for search
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
+if "search_results" not in st.session_state:
+    st.session_state.search_results = []
 
-# --- Step 2: Text input bound to local variable ---
-input_query = st.text_input("Search FrayerStore", value=url_query).strip()
+# Search input
+query = st.text_input(
+    "Search FrayerStore",
+    value=st.session_state.search_query,
+    key="search_input",
+).strip()
 
-# --- Step 3: Only update URL if input changed ---
-if input_query != url_query:
-    st.query_params = {"q": [input_query]}  # triggers rerun
-    # On rerun, url_query will now equal input_query
+# Perform search only if the query changed
+if query != st.session_state.search_query:
+    st.session_state.search_query = query
+    if query:
+        st.session_state.search_results = search_query(query)
+    else:
+        st.session_state.search_results = []
 
-# --- Step 4: Run search using current input_query (or url_query) ---
-search_term = st.query_params.get("q", [""])[0]  # safe to read again
-results = search_query(search_term) if search_term else []
-
-# --- Step 5: Display results ---
-for word in results:
-    with st.expander(f"{word.word} – {word.subject_name}", expanded=False):
-        word.display_frayer(include_subject_info=True, show_topics=True)
+# Display results
+results = st.session_state.search_results
+display_search_results(results, query)
