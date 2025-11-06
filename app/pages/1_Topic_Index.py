@@ -5,7 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 
-st.title("All models")
+st.title("Topic Index")
 
 # -----------------------------
 # Load data
