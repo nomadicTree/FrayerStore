@@ -31,30 +31,19 @@ def display_search_results(results, query):
 st.set_page_config(page_title="FrayerStore")
 st.title("Search")
 
-# --- Step 1: Initialize session state once ---
-if "search_query" not in st.session_state:
-    # Use URL query if available, otherwise empty
-    url_query = st.query_params.get("q", [""])[0]
-    st.session_state.search_query = url_query
-if "search_results" not in st.session_state:
-    st.session_state.search_results = []
+# --- Step 1: Read query from URL ---
+query = st.query_params.get("q", [""])[0]
 
-# --- Step 2: Text input bound to session state ---
-query = st.text_input(
-    "Search FrayerStore",
-    value=st.session_state.search_query,
-    key="search_input",  # binds directly to session_state
-).strip()
+# --- Step 2: Search input controlled by URL ---
+query = st.text_input("Search FrayerStore", value=query).strip()
 
-# --- Step 3: Update results only if the input changed ---
-if query != st.session_state.search_query:
-    st.session_state.search_query = query
-    st.session_state.search_results = search_query(query) if query else []
+# --- Step 3: Update URL if input changed ---
+st.query_params = {"q": [query]}
 
-    # Update URL to match the session state
-    st.query_params = {"q": [query]}  # triggers rerun safely
+# --- Step 4: Run search ---
+results = search_query(query) if query else []
 
-# --- Step 4: Display results ---
-for word in st.session_state.search_results:
+# --- Step 5: Display results ---
+for word in results:
     with st.expander(f"{word.word} – {word.subject_name}", expanded=False):
         word.display_frayer(include_subject_info=True, show_topics=True)
