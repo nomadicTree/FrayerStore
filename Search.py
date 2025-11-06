@@ -24,7 +24,7 @@ def display_search_results(results, query):
         st.info("No results found.")
 
 
-st.set_page_config(page_title="FrayerStore")
+st.set_page_config(page_title="Frayer Store")
 st.title("Search")
 
 # Initialize session state for search
@@ -35,7 +35,7 @@ if "search_results" not in st.session_state:
 
 # Search input
 query = st.text_input(
-    "Search FrayerStore",
+    "Search for a word",
     value=st.session_state.search_query,
     key="search_input",
 ).strip()
@@ -51,4 +51,3 @@ if query != st.session_state.search_query:
 # Display results
 results = st.session_state.search_results
 display_search_results(results, query)
-display_search_results(results, user_input)
