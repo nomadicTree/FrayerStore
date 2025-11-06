@@ -24,7 +24,7 @@ def display_search_results(results, query):
         st.info("No results found.")
 
 
-st.set_page_config(page_title="Frayer Dictionary")
+st.set_page_config(page_title="Frayer Store")
 st.title("Search")
 
 # Initialize session state for search

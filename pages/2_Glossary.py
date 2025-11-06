@@ -6,6 +6,7 @@ from app_lib.repositories import (
 )
 
 st.title("Glossary")
+st.set_page_config(page_title="Frayer Store")
 
 data = get_all_subjects_courses_topics()
 
