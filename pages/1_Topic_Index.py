@@ -5,6 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 from app_lib.selection_helpers import select_subject, select_course
+from app_lib.utils import apply_styles
 
 
 def get_topics_with_words(data, subject, course):
@@ -32,7 +33,16 @@ def get_topics_with_words(data, subject, course):
 def display_sidebar_navigation(topics):
     for topic in topics:
         st.sidebar.markdown(
-            f"- [{topic['label']}](#topic-{topic['id']})",
+            f"""
+            <a href="#topic-{topic['id']}" style="
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                font-size: 0.875rem;
+            ">
+                {topic['label']}
+            </a>
+            """,
             unsafe_allow_html=True,
         )
 
@@ -46,7 +56,7 @@ def display_topics_and_words(topics):
         for w in topic["words"]:
             word_obj = Word(w)
             with st.expander(word_obj.word, expanded=False):
-                word_obj.display_frayer()
+                word_obj.display_frayer(show_link=True)
 
 
 # ----------------------------
@@ -58,6 +68,7 @@ def main():
         page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎"
     )
     st.title(PAGE_TITLE)
+    apply_styles()
 
     data = get_all_subjects_courses_topics()
 

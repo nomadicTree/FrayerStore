@@ -1,6 +1,7 @@
 import streamlit as st
 from app_lib.models import Word
 from app_lib.repositories import search_words
+from app_lib.utils import apply_styles
 
 
 PAGE_TITLE = "Search"
@@ -22,13 +23,16 @@ def display_search_results(results, query):
                 f"{word.word} – {word.subject_name}",
                 expanded=expand_results,
             ):
-                word.display_frayer(show_subject=True, show_topics=True)
+                word.display_frayer(
+                    show_subject=True, show_topics=True, show_link=True
+                )
     elif query:
         st.info("No results found.")
 
 
 st.title(PAGE_TITLE)
 st.set_page_config(page_title=f"FrayerStore", page_icon="🔎")
+apply_styles()
 
 
 # Initialize session state for search

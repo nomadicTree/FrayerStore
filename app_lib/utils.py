@@ -34,12 +34,27 @@ def render_frayer(
     non_examples,
     subject_name=None,
     topics=None,
+    show_link=False,
 ):
-    st.subheader(word)
+    word_url = f"/View?id={word_id}"
+    if show_link:
+        st.markdown(
+            f"""
+            <div class="frayer-title">
+                <h3>
+                    <a href="{word_url}" target="_blank" class="word-link">
+                        {word} <span class="open-link-icon">🔗</span>
+                    </a>
+                </h3>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.subheader(word)
     # Optional subject/courses display
     if subject_name:
         st.caption(f"Subject: **{subject_name}**")
-
     col1, col2 = st.columns(2, border=True)
     with col1:
         st.markdown("#### Definition")
@@ -48,11 +63,11 @@ def render_frayer(
         st.markdown("#### Characteristics")
         st.markdown(list_to_md(characteristics))
 
-    col3, col4 = st.columns(2, border=True)
-    with col3:
+    col1, col2 = st.columns(2, border=True)
+    with col1:
         st.markdown("#### Examples")
         st.markdown(list_to_md(examples))
-    with col4:
+    with col2:
         st.markdown("#### Non-examples")
         st.markdown(list_to_md(non_examples))
 
@@ -86,3 +101,29 @@ def safe_snake_case_filename(s: str, extension) -> str:
 
     # Strip leading/trailing underscores
     return f"{s.strip("_")}.{extension}"
+
+
+def apply_styles():
+    st.html(
+        """
+    <style>
+    [data-testid='stHeaderActionElements'] {display: none;}
+    .open-link-icon {
+        text-decoration: none !important;
+        opacity: 0;
+        transition: opacity 0.2s;
+        cursor: pointer;
+    }
+
+    .frayer-title .word-link {
+        text-decoration: none !important;
+        color: inherit;
+        position: relative;
+    }
+
+    .frayer-title:hover .open-link-icon {
+        opacity: 1;
+    }
+    </style>
+    """
+    )

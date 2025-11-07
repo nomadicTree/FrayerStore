@@ -29,7 +29,9 @@ class Word:
 
         self.topics = [dict(r) for r in topic_rows]
 
-    def display_frayer(self, show_subject=False, show_topics=False):
+    def display_frayer(
+        self, show_subject=False, show_topics=False, show_link=False
+    ):
         subject = self.subject_name if show_subject else None
         topics = self.topics if show_topics else None
         render_frayer(
@@ -41,4 +43,5 @@ class Word:
             self.non_examples,
             subject_name=subject,
             topics=topics,
+            show_link=show_link,
         )

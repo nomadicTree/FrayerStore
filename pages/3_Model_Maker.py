@@ -2,7 +2,7 @@ import streamlit as st
 import yaml
 from dataclasses import dataclass
 from app_lib.repositories import get_all_subjects_courses_topics
-from app_lib.utils import render_frayer, safe_snake_case_filename
+from app_lib.utils import render_frayer, safe_snake_case_filename, apply_styles
 
 
 @dataclass
@@ -106,6 +106,7 @@ def main():
         page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎"
     )
     st.title(PAGE_TITLE)
+    apply_styles()
     data = get_all_subjects_courses_topics()
 
     selected_subjects = select_subject(data)
