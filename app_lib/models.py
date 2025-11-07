@@ -1,8 +1,6 @@
 import json
-import streamlit as st
 from app_lib.repositories import get_topics_for_word, get_subject_name
-from app_lib.utils import list_to_md
-import pandas as pd
+from app_lib.utils import render_frayer
 
 
 class Word:
@@ -31,44 +29,16 @@ class Word:
 
         self.topics = [dict(r) for r in topic_rows]
 
-    def display_topics(self):
-        topics_frame = pd.DataFrame(self.topics)
-        column_config = {
-            "code": st.column_config.Column("Code", width="auto"),
-            "topic_name": st.column_config.Column("Topic", width="auto"),
-            "course_name": st.column_config.Column("Course"),
-        }
-        st.dataframe(
-            topics_frame,
-            hide_index=True,
-            column_order=("course_name", "code", "topic_name"),
-            column_config=column_config,
-            key=f"topic_frame_{self.id}",
+    def display_frayer(self, show_subject=False, show_topics=False):
+        subject = self.subject_name if show_subject else None
+        topics = self.topics if show_topics else None
+        render_frayer(
+            self.id,
+            self.word,
+            self.definition,
+            self.characteristics,
+            self.examples,
+            self.non_examples,
+            subject_name=subject,
+            topics=topics,
         )
-
-    def display_frayer(self, include_subject_info=False, show_topics=False):
-        st.subheader(self.word)
-
-        # Optional subject/courses display
-        if include_subject_info:
-            st.caption(f"Subject: **{self.subject_name}**")
-
-        col1, col2 = st.columns(2, border=True)
-        with col1:
-            st.markdown("#### Definition")
-            st.write(self.definition)
-        with col2:
-            st.markdown("#### Characteristics")
-            st.markdown(list_to_md(self.characteristics))
-
-        col3, col4 = st.columns(2, border=True)
-        with col3:
-            st.markdown("#### Examples")
-            st.markdown(list_to_md(self.examples))
-        with col4:
-            st.markdown("#### Non-examples")
-            st.markdown(list_to_md(self.non_examples))
-
-        if show_topics and self.topics:
-            st.markdown("##### Topics:")
-            self.display_topics()
