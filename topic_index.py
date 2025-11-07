@@ -7,6 +7,8 @@ from app_lib.repositories import (
 from app_lib.selection_helpers import select_subject, select_course
 from app_lib.utils import apply_styles
 
+PAGE_TITLE = "Topic Index"
+
 
 def get_topics_with_words(data, subject, course):
     topics_with_words = []
@@ -63,10 +65,6 @@ def display_topics_and_words(topics):
 # Main Page Logic
 # ----------------------------
 def main():
-    PAGE_TITLE = "Topic Index"
-    st.set_page_config(
-        page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎"
-    )
     st.title(PAGE_TITLE)
     apply_styles()
 

@@ -4,7 +4,6 @@ from app_lib.repositories import get_word_by_id
 from app_lib.utils import apply_styles
 
 PAGE_TITLE = "View"
-st.set_page_config(page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎")
 apply_styles()
 query_params = st.query_params
 id_param = query_params.get("id")  # returns a string or None

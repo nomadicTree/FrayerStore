@@ -102,9 +102,6 @@ def word_input_form():
 # ----------------------------
 def main():
     PAGE_TITLE = "Model Maker"
-    st.set_page_config(
-        page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎"
-    )
     st.title(PAGE_TITLE)
     apply_styles()
     data = get_all_subjects_courses_topics()

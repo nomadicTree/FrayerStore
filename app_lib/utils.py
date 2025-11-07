@@ -36,7 +36,7 @@ def render_frayer(
     topics=None,
     show_link=False,
 ):
-    word_url = f"/View?id={word_id}"
+    word_url = f"/view?id={word_id}"
     if show_link:
         st.markdown(
             f"""

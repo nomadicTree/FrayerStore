@@ -35,9 +35,6 @@ def display_words(words):
 # ----------------------------
 def main():
     PAGE_TITLE = "Glossary"
-    st.set_page_config(
-        page_title=f"FrayerStore | {PAGE_TITLE}", page_icon="🔎"
-    )
     st.title(PAGE_TITLE)
     apply_styles()
 
