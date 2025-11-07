@@ -22,9 +22,7 @@ def display_search_results(results, query):
                 f"{word.word} – {word.subject_name}",
                 expanded=expand_results,
             ):
-                word.display_frayer(
-                    include_subject_info=True, show_topics=True
-                )
+                word.display_frayer(show_subject=True, show_topics=True)
     elif query:
         st.info("No results found.")
 
