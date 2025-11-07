@@ -78,8 +78,8 @@ def select_topics(course_topics):
 def word_input_form():
     """Render input fields for word data and display YAML output."""
 
-    word = st.text_input("Word *")
-    definition = st.text_area("Definition *")
+    word = st.text_input("Word")
+    definition = st.text_area("Definition")
     characteristics = st.text_area("Characteristics (one per line)")
     examples = st.text_area("Examples (one per line)")
     non_examples = st.text_area("Non-Examples (one per line)")
