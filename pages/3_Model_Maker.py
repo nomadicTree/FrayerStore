@@ -82,7 +82,7 @@ def word_input_form():
     definition = st.text_area("Definition")
     characteristics = st.text_area("Characteristics (one per line)")
     examples = st.text_area("Examples (one per line)")
-    non_examples = st.text_area("Non-Examples (one per line)")
+    non_examples = st.text_area("Non-examples (one per line)")
     yaml_data = {
         "word": word.strip(),
         "definition": definition.strip(),
