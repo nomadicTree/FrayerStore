@@ -62,3 +62,14 @@ def get_words_by_topic(topic_id):
     """
     rows = db.execute(q, (topic_id,)).fetchall()
     return rows
+
+
+def get_word_by_id(word_id):
+    try:
+        word_id = int(word_id)
+    except TypeError:
+        return None
+    db = get_db()
+    q = "SELECT * FROM Word WHERE id = ?"
+    row = db.execute(q, (word_id,)).fetchone()
+    return row
