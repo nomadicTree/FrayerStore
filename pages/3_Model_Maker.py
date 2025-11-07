@@ -46,7 +46,9 @@ def select_subjects(data):
     if not subjects_available:
         st.info("No subjects available.")
         st.stop()
-    selected_subjects = st.multiselect("Select subjects", subjects_available)
+    selected_subjects = st.multiselect(
+        "Select subjects", subjects_available, default=subjects_available[0]
+    )
     if not selected_subjects:
         st.info("Select at least one subject.")
         st.stop()
