@@ -63,7 +63,7 @@ def main():
 
     subject = select_subject(data)
     course = select_course(data, subject)
-
+    st.divider()
     topics_with_words = get_topics_with_words(data, subject, course)
     display_sidebar_navigation(topics_with_words)
     display_topics_and_words(topics_with_words)

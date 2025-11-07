@@ -42,6 +42,7 @@ def main():
     data = get_all_subjects_courses_topics()
     subject = select_subject(data)
     course = select_course(data, subject)
+    st.divider()
     words = get_words_for_course(data, subject, course)
     display_words(words)
 
