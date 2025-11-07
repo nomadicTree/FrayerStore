@@ -16,7 +16,7 @@ def search_query(query):
 
 def display_search_results(results, query):
     if results:
-        expand_results = len(results) < 3
+        expand_results = len(results) == 1
         for word in results:
             with st.expander(
                 f"{word.word} – {word.subject_name}",
