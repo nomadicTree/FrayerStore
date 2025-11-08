@@ -5,8 +5,8 @@ import streamlit as st
 pages = {
     "Frayer Models": [
         st.Page("search_words.py", title="Search", icon="🔎", default=True),
-        st.Page("topic_index.py", title="Topic Index", icon="🗂️"),
-        st.Page("glossary.py", title="Glossary", icon="📖"),
+        st.Page("topic_glossary.py", title="Topic Glossary", icon="🗂️"),
+        st.Page("course_glossary.py", title="Course Glossary", icon="📖"),
     ],
     "Utilities": [
         st.Page("model_maker.py", title="Model Maker", icon="🛠️"),
