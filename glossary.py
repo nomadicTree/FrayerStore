@@ -7,6 +7,8 @@ from app_lib.repositories import (
 from app_lib.selection_helpers import select_subject, select_course
 from app_lib.utils import apply_styles
 
+PAGE_TITLE = "Glossary"
+
 
 def get_words_for_course(data, subject, course):
     all_words = []
@@ -30,11 +32,7 @@ def display_words(words):
             w.display_frayer(show_topics=True, show_link=True)
 
 
-# ----------------------------
-# Main page logic
-# ----------------------------
 def main():
-    PAGE_TITLE = "Glossary"
     st.title(PAGE_TITLE)
     apply_styles()
 
