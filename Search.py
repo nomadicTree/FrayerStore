@@ -7,7 +7,7 @@ pages = {
         st.Page("glossary.py", title="Glossary", icon="📖"),
     ],
     "Admin": [
-        st.Page("model_make.py", title="Model Maker", icon="🛠️"),
+        st.Page("model_maker.py", title="Model Maker", icon="🛠️"),
         st.Page("view.py", title="Model Viewer", icon="🪟"),
     ],
 }
