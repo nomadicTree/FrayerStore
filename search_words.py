@@ -1,3 +1,6 @@
+"""Streamlit page for searching the words database"""
+
+from typing import List
 import streamlit as st
 from app_lib.models import Word
 from app_lib.repositories import search_words
@@ -7,7 +10,15 @@ from app_lib.utils import apply_styles
 PAGE_TITLE = "Search"
 
 
-def search_query(query):
+def search_query(query: str) -> List[Word]:
+    """Wrapper for searching words and returning Word objects
+
+    Args:
+        query: search query
+
+    Returns:
+        Search results as Word objects
+    """
     word_rows = search_words(query)
     words = []
     for r in word_rows:
@@ -15,7 +26,13 @@ def search_query(query):
     return words
 
 
-def display_search_results(results, query):
+def display_search_results(results: List[Word], query: str) -> None:
+    """Display all results as expandable Frayer Models
+
+    Args:
+        results: search results to display
+        query: original search query
+    """
     if results:
         expand_results = len(results) == 1
         for word in results:
@@ -31,6 +48,7 @@ def display_search_results(results, query):
 
 
 def main():
+    """Page contents including search bar and search results"""
     st.title(PAGE_TITLE)
     apply_styles()
 
@@ -45,7 +63,7 @@ def main():
         "Search FrayerStore",
         value=st.session_state.search_query,
         key="search_input",
-    ).strip()
+    )
     st.divider()
 
     # Perform search only if the query changed
