@@ -7,7 +7,7 @@ from app_lib.repositories import (
 from app_lib.selection_helpers import select_subject, select_course
 from app_lib.utils import apply_styles, render_frayer
 
-PAGE_TITLE = "Topic Index"
+PAGE_TITLE = "Topic Glossary"
 
 
 def get_topics_with_words(data, subject, course):
@@ -20,7 +20,8 @@ def get_topics_with_words(data, subject, course):
                 topics_with_words.append(
                     {
                         "id": topic_id,
-                        "label": f"{row['code']}: {row['topic_name']}",
+                        "code": row["code"],
+                        "label": row["topic_label"],
                         "words": words,
                     }
                 )
@@ -36,7 +37,7 @@ def display_sidebar_navigation(topics):
     for topic in topics:
         st.sidebar.markdown(
             f"""
-            <a href="#topic-{topic['id']}" style="
+            <a href="#{topic['code']}" style="
                 text-decoration: none;
                 color: inherit;
                 display: block;
@@ -51,9 +52,7 @@ def display_sidebar_navigation(topics):
 
 def display_topics_and_words(topics):
     for topic in topics:
-        st.markdown(
-            f"<a id='topic-{topic['id']}'></a>", unsafe_allow_html=True
-        )
+        st.markdown(f"<a id='{topic['code']}'></a>", unsafe_allow_html=True)
         st.subheader(topic["label"])
         for w in topic["words"]:
             word_obj = Word(w)
