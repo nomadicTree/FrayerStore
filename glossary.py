@@ -5,7 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 from app_lib.selection_helpers import select_subject, select_course
-from app_lib.utils import apply_styles
+from app_lib.utils import apply_styles, render_frayer
 
 PAGE_TITLE = "Glossary"
 
@@ -29,7 +29,7 @@ def get_words_for_course(data, subject, course):
 def display_words(words):
     for w in words:
         with st.expander(w.word, expanded=False):
-            w.display_frayer(show_topics=True, show_link=True)
+            render_frayer(w.as_dict(), show_topics=True)
 
 
 def main():

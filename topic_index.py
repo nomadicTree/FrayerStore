@@ -5,7 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 from app_lib.selection_helpers import select_subject, select_course
-from app_lib.utils import apply_styles
+from app_lib.utils import apply_styles, render_frayer
 
 PAGE_TITLE = "Topic Index"
 
@@ -58,7 +58,7 @@ def display_topics_and_words(topics):
         for w in topic["words"]:
             word_obj = Word(w)
             with st.expander(word_obj.word, expanded=False):
-                word_obj.display_frayer(show_link=True)
+                render_frayer(word_obj.as_dict())
 
 
 # ----------------------------

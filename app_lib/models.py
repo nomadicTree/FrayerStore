@@ -1,6 +1,5 @@
 import json
 from app_lib.repositories import get_topics_for_word, get_subject_name
-from app_lib.utils import render_frayer
 
 
 class Word:
@@ -29,19 +28,14 @@ class Word:
 
         self.topics = [dict(r) for r in topic_rows]
 
-    def display_frayer(
-        self, show_subject=False, show_topics=False, show_link=False
-    ):
-        subject = self.subject_name if show_subject else None
-        topics = self.topics if show_topics else None
-        render_frayer(
-            self.id,
-            self.word,
-            self.definition,
-            self.characteristics,
-            self.examples,
-            self.non_examples,
-            subject_name=subject,
-            topics=topics,
-            show_link=show_link,
-        )
+    def as_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "word": self.word,
+            "definition": self.definition,
+            "characteristics": self.characteristics,
+            "examples": self.examples,
+            "non_examples": self.non_examples,
+            "subject_name": self.subject_name,
+            "topics": self.topics,
+        }

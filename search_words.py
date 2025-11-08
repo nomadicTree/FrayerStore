@@ -4,7 +4,7 @@ from typing import List
 import streamlit as st
 from app_lib.models import Word
 from app_lib.repositories import search_words
-from app_lib.utils import apply_styles
+from app_lib.utils import apply_styles, render_frayer
 
 
 PAGE_TITLE = "Search"
@@ -40,8 +40,10 @@ def display_search_results(results: List[Word], query: str) -> None:
                 f"{word.word} – {word.subject_name}",
                 expanded=expand_results,
             ):
-                word.display_frayer(
-                    show_subject=True, show_topics=True, show_link=True
+                render_frayer(
+                    word.as_dict(),
+                    show_subject=True,
+                    show_topics=True,
                 )
     elif query:
         st.info("No results found.")
