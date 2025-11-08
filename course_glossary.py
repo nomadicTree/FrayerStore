@@ -5,7 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 from app_lib.selection_helpers import select_subject, select_course
-from app_lib.utils import apply_styles, render_frayer
+from app_lib.utils import page_header, render_frayer
 
 PAGE_TITLE = "Course Glossary"
 
@@ -33,8 +33,7 @@ def display_words(words):
 
 
 def main():
-    st.title(PAGE_TITLE)
-    apply_styles()
+    page_header(PAGE_TITLE)
 
     with st.spinner("Loading..."):
         data = get_all_subjects_courses_topics()

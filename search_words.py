@@ -62,7 +62,7 @@ def display_search_results(
 
 def main():
     """Page contents including search bar and search results"""
-    st.title(PAGE_TITLE)
+    st.title("FrayerStore")
     apply_styles()
 
     # Initialize session state for search

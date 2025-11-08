@@ -1,12 +1,12 @@
 import streamlit as st
 from app_lib.models import Word
 from app_lib.repositories import get_word_by_id
-from app_lib.utils import apply_styles, render_frayer
+from app_lib.utils import page_header, render_frayer
 
-PAGE_TITLE = "View"
-apply_styles()
 query_params = st.query_params
 id_param = query_params.get("id")  # returns a string or None
+
+page_header()
 
 if id_param is None:
     st.info("No id given in URL. Are you here accidentally?")

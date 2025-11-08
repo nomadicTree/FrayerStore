@@ -185,3 +185,10 @@ def format_time_text(elapsed_time: float) -> str:
         return f"{elapsed_time * 1_000_000:.1f} µs"
     else:
         return f"{elapsed_time * 1_000:.3f} ms"
+
+
+def page_header(title: str = ""):
+    st.title("FrayerStore")
+    if title:
+        st.header(title)
+    apply_styles()
