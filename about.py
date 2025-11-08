@@ -33,7 +33,7 @@ def main():
     st.markdown(
         """
         I had the idea for FrayerStore following an inset day at my school.
-        The day focussed on disciplinary literacy and strategies to help students improve their reading skills.
+        The day focused on disciplinary literacy and strategies to help students improve their reading skills.
         We were encouraged to explore methods, like Frayer Models, to help students improve as readers and learn subject-specific vocabulary.
 
         Frayer Models are great, but I find the mechanics of making and sharing them tedious.
