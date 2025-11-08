@@ -9,7 +9,7 @@ query_params = st.query_params
 id_param = query_params.get("id")  # returns a string or None
 
 if id_param is None:
-    st.info("No id given in URL")
+    st.info("No id given in URL. Are you here accidentally?")
 else:
     try:
         word_id = int(id_param)
