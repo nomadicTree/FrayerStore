@@ -34,7 +34,7 @@ def display_search_results(results: List[Word], query: str) -> None:
         query: original search query
     """
     if results:
-        expand_results = len(results) == 1
+        expand_results = len(results) == 1  # Expand if only one result
         for word in results:
             with st.expander(
                 f"{word.word} – {word.subject_name}",
