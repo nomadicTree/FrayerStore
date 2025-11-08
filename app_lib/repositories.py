@@ -9,10 +9,10 @@ def search_words(query: str) -> List[sqlite3.Row]:
     """Search database for words matching query
 
     Args:
-        query (str): search query
+        query: search query
 
     Returns:
-        list of sqlite3.Row: rows of matching words
+        Rows of matching words
     """
     query = query.strip()
     db = get_db()
@@ -25,10 +25,10 @@ def get_subject_name(subject_id: int) -> str:
     """Return subject name given its ID
 
     Args:
-        subject_id (int): subject ID
+        subject_id: subject ID
 
     Returns:
-        str: subject name or None if not found
+        Subject name or None if not found
     """
     db = get_db()
     q = "SELECT name FROM Subject WHERE id = ?"
@@ -41,10 +41,10 @@ def get_topics_for_word(word_id: int) -> List[sqlite3.Row]:
     """Return all topics associated with a given word
 
     Args:
-        word_id (int): word ID
+        word_id: word ID
 
     Returns:
-        list of sqlite3.Row: rows corresponding to topics for the word
+        Rows corresponding to topics for the word
         Each row contains 'code', 'topic_name', and 'course_name' fields.
     """
     db = get_db()
@@ -66,7 +66,7 @@ def get_topics_for_word(word_id: int) -> List[sqlite3.Row]:
 def get_all_subjects_courses_topics() -> List[sqlite3.Row]:
     """Return a list of rows containing all subjects, courses, and topics
     Returns:
-        list of sqlite3.Row: rows corresponding to subjects, courses, and topics
+        Rows corresponding to subjects, courses, and topics
         Each row contains 'subject', 'course', 'topic_id', 'code', and 'topic_name' fields.
         Ordered by subject name, course name, and topic code.
     """
@@ -90,9 +90,9 @@ def get_all_subjects_courses_topics() -> List[sqlite3.Row]:
 def get_words_by_topic(topic_id: int) -> List[sqlite3.Row]:
     """Return a list of rows containing all words associated with a given topic
     Args:
-        topic_id (int): topic ID
+        topic_id: topic ID
     Returns:
-        list of sqlite3.Row: rows corresponding to words for the topic
+        Rows corresponding to words for the topic
     """
     db = get_db()
     q = """
@@ -109,10 +109,10 @@ def get_word_by_id(word_id: int) -> sqlite3.Row:
     """Return row for word given its id
 
     Args:
-        word_id (int): word ID
+        word_id: word ID
 
     Returns:
-        sqlite3.Row: row corresponding to the word or None if not found
+        Row corresponding to the word or None if not found
     """
     try:
         word_id = int(word_id)
