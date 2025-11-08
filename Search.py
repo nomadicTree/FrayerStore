@@ -8,6 +8,10 @@ pages = {
         st.Page("topic_glossary.py", title="Topic Glossary", icon="📄"),
         st.Page("course_glossary.py", title="Course Glossary", icon="📖"),
     ],
+    "Info": [
+        st.Page("about.py", title="About", icon="ℹ️"),
+        st.Page("license.py", title="Licensing", icon="⚖️"),
+    ],
     "Utilities": [
         st.Page("model_maker.py", title="Model Maker", icon="🛠️"),
         st.Page("view.py", title="Model Viewer", icon="🪟"),
