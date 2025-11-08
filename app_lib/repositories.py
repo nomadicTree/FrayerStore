@@ -45,17 +45,20 @@ def get_topics_for_word(word_id: int) -> List[sqlite3.Row]:
 
     Returns:
         Rows corresponding to topics for the word
-        Each row contains 'code', 'topic_name', and 'course_name' fields.
+        Each row contains 'code', 'topic_name', 'course_name', and topic_label fields.
     """
     db = get_db()
     q = """
     SELECT
         Topic.code,
         Topic.name AS topic_name,
-        Course.name AS course_name
+        Course.name AS course_name,
+        Subject.name AS subject_name,
+        Topic.code || ': ' || Topic.name AS topic_label
     FROM Topic
     JOIN WordTopic ON Topic.id = WordTopic.topic_id
     JOIN Course ON Topic.course_id = Course.id
+    JOIN Subject ON Course.subject_id = Subject.id
     WHERE WordTopic.word_id = ?
     ORDER BY Course.name, Topic.code
     """
@@ -67,7 +70,7 @@ def get_all_subjects_courses_topics() -> List[sqlite3.Row]:
     """Return a list of rows containing all subjects, courses, and topics
     Returns:
         Rows corresponding to subjects, courses, and topics
-        Each row contains 'subject', 'course', 'topic_id', 'code', and 'topic_name' fields.
+        Each row contains 'subject', 'course', 'topic_id', 'code', 'topic_name', and 'topic_label' fields.
         Ordered by subject name, course name, and topic code.
     """
     db = get_db()
@@ -77,7 +80,8 @@ def get_all_subjects_courses_topics() -> List[sqlite3.Row]:
     Course.name as course,
     Topic.id as topic_id,
     Topic.code,
-    Topic.name as topic_name
+    Topic.name as topic_name,
+    Topic.code || ': ' || Topic.name AS topic_label
     FROM Subject
     JOIN Course ON Subject.id = Course.subject_id
     JOIN Topic ON Course.id = Topic.course_id
