@@ -109,13 +109,13 @@ def main():
     selected_subjects = select_subject(data)
     selected_courses = select_courses(data, selected_subjects)
     course_topics = get_topics_by_course(data, selected_courses)
+    selected_topics = select_topics(course_topics)
     st.divider()
 
     # Build YAML-ready topics
 
     word_data = word_input_form()
 
-    selected_topics = select_topics(course_topics)
     yaml_topics = [
         {"course": course, "codes": sorted(codes)}
         for course, codes in selected_topics.items()
