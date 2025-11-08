@@ -1,3 +1,5 @@
+"""Entry point for Streamlit app"""
+
 import streamlit as st
 
 pages = {
