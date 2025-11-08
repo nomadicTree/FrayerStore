@@ -1,4 +1,5 @@
 import re
+import time
 import unicodedata
 from typing import List
 import streamlit as st
@@ -170,3 +171,18 @@ def apply_styles():
     </style>
     """
     )
+
+
+def format_time_text(elapsed_time: float) -> str:
+    """Format elapsed time into a human-readable string
+
+    Args:
+        time: elapsed time in seconds
+
+    Returns:
+        Formatted time string
+    """
+    if elapsed_time < 0.001:
+        return f"{elapsed_time * 1_000_000:.1f} µs"
+    else:
+        return f"{elapsed_time * 1_000:.3f} ms"
