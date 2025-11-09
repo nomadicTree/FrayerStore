@@ -68,3 +68,6 @@
 - Procedural programming
 - Object-oriented programming
 - Programming paradigm
+- Recursion
+- Recursive case
+- Base case
