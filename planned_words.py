@@ -10,8 +10,7 @@ def main():
     st.markdown(
         """
         Each time I create a Frayer Model for a word, it raises new words that also need Frayer Models.
-        This page contains my to-do list of words I plan to add to the database (in no particular order).
-        The list is not comprehensive!
+        This page contains my to-do list—in no particular order, and by no means complete.
         """
     )
 
