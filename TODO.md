@@ -1,0 +1,59 @@
+- MAR
+- MDR
+- PC
+- Accumulator
+- RAM/Memory
+- Primary storage
+- Secondary storage
+- Volatile
+- Non-Volatile
+- Cache
+- Current instruction register
+- GPU
+- Fetch-Decode-Execute
+- Hardware
+- Software
+- Instruction
+- Clock
+- Clock speed
+- Core
+- ALU
+- Von Neumann architecture
+- CISC
+- RISC
+- Harvard architecture
+- Embedded system
+- Virtual memory
+- Algorithm
+- Pseudocode
+- Flowchart
+- Decomposition
+- Abstraction
+- Sequence
+- Selection
+- Iteration
+- Method
+- Getter
+- Setter
+- Object
+- Operator
+- Logical operator
+- Arithmetic operator
+- Comparison operator
+- Date type
+- String (str)
+- Character (char)
+- Integer (int)
+- Float/real
+- Boolean
+- Binary
+- Hexadecimal
+- Denary
+- Assignment
+- Control flow
+- Subprogram
+- Function
+- Procedure
+- Declare
+- Initialise
+ 
