@@ -71,3 +71,8 @@
 - Recursion
 - Recursive case
 - Base case
+- Encapsulation
+- Polymorphism
+- Inheritance
+- Composition
+- Data hiding
