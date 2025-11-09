@@ -15,7 +15,9 @@ def get_topics_with_words(data, subject, course):
     for row in data:
         if row["subject"] == subject and row["course"] == course:
             topic_id = row["topic_id"]
-            words = get_words_by_topic(topic_id)
+            words = sorted(
+                get_words_by_topic(topic_id), key=lambda w: w["word"].lower()
+            )
             if words:  # Only include topics with words
                 topics_with_words.append(
                     {
