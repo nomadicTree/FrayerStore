@@ -141,3 +141,22 @@ def get_word_by_id(word_id: int) -> dict | None:
     q = "SELECT * FROM Word WHERE id = ?"
     row = db.execute(q, (word_id,)).fetchone()
     return dict(row) if row else None
+
+
+def get_related_words(word_id: int) -> List[dict] | None:
+    """Return all related words to word_id"""
+    db = get_db()
+    q = """
+    SELECT w.id, w.word
+    FROM WordRelationship r
+    JOIN Word w ON w.id = CASE
+        WHEN r.word_id1 = ? THEN r.word_id2
+        ELSE r.word_id1
+    END
+    WHERE r.word_id1 = ? OR r.word_id2 = ?
+    """
+
+    rows = db.execute(q, (word_id, word_id, word_id)).fetchall()
+
+    # Convert to list of dicts
+    return [{"id": r[0], "word": r[1]} for r in rows] if rows else []

@@ -1,5 +1,9 @@
 import json
-from app_lib.repositories import get_topics_for_word, get_subject_name
+from app_lib.repositories import (
+    get_topics_for_word,
+    get_subject_name,
+    get_related_words,
+)
 
 
 class Word:
@@ -28,6 +32,8 @@ class Word:
 
         self.topics = [dict(r) for r in topic_rows]
 
+        self._related_words = None
+
     def as_dict(self) -> dict:
         return {
             "id": self.id,
@@ -38,4 +44,14 @@ class Word:
             "non_examples": self.non_examples,
             "subject_name": self.subject_name,
             "topics": self.topics,
+            "related_words": self.related_words,
         }
+
+    @property
+    def related_words(self):
+        if self._related_words is None:
+            self._related_words = get_related_words(self.id)
+            # Add urls
+            for w in self._related_words:
+                w["url"] = f"/view?id={w["id"]}"
+        return self._related_words

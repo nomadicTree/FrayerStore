@@ -6,6 +6,23 @@ import streamlit as st
 import pandas as pd
 
 
+def render_related_words(words, word_id):
+    words_frame = pd.DataFrame(words)
+    column_config = {
+        "word": st.column_config.Column("Word", width="auto"),
+        "url": st.column_config.LinkColumn(
+            "Link", width="auto", display_text="Go to Frayer Model"
+        ),
+    }
+    st.dataframe(
+        words_frame,
+        hide_index=True,
+        column_order=("word", "url"),
+        column_config=column_config,
+        key=f"related_words_{word_id}",
+    )
+
+
 def render_topics(topics, word_id):
     for t in topics:
         subject_name = t["subject_name"].replace(" ", "+")
@@ -81,6 +98,7 @@ def render_frayer(
     show_examples=True,
     show_characteristics=True,
     show_non_examples=True,
+    show_related_words=True,
 ):
     if show_word:
         word = frayer_dict["word"]
@@ -132,6 +150,9 @@ def render_frayer(
         else:
             blank_box()
 
+    if show_related_words and frayer_dict["related_words"]:
+        st.markdown("##### Related words:")
+        render_related_words(frayer_dict["related_words"], frayer_dict["id"])
     if show_topics:
         st.markdown("##### Topics:")
         render_topics(frayer_dict["topics"], frayer_dict["id"])
