@@ -17,3 +17,5 @@ non_examples:
 topics:
   - course: OCR J277
     codes: [2.2.1]
+  - course: OCR H446
+    codes: [2.2.1]
