@@ -85,20 +85,20 @@ def main():
     with st.spinner("Searching..."):
 
         # Perform search only if the query changed
-        if query != st.session_state.search_query:
+        if query.strip() and query != st.session_state.search_query:
             st.session_state.search_query = query
             if query:
                 (
                     st.session_state.search_results,
                     st.session_state.elapsed_time,
                 ) = search_query(query)
-            else:
-                st.session_state.search_results = []
 
         # Display results
         results = st.session_state.search_results
         elapsed_time = st.session_state.elapsed_time
-    display_search_results(results, query, elapsed_time)
+    display_search_results(
+        results, st.session_state["search_query"], elapsed_time
+    )
 
 
 if __name__ == "__main__":
