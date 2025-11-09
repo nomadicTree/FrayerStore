@@ -56,4 +56,15 @@
 - Procedure
 - Declare
 - Initialise
- 
+- Primitive data type
+- Data structure
+- List
+- Array
+- Queue
+- Stack
+- Graph (directed, undirected, weighted, unweighted...)
+- Tree
+- Binary search tree
+- Procedural programming
+- Object-oriented programming
+- Programming paradigm
