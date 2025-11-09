@@ -7,7 +7,8 @@ PAGE_TITLE = "Licensing"
 
 def show_markdown_file(file_path: Path):
     md_text = Path(file_path).read_text(encoding="utf-8")
-    st.code(md_text, language="markdown")
+    with st.container(border=True):
+        st.markdown(md_text)
 
 
 def main():
