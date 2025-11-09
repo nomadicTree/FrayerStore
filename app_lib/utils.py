@@ -150,12 +150,17 @@ def render_frayer(
         else:
             blank_box()
 
-    if show_related_words and frayer_dict["related_words"]:
-        st.markdown("##### Related words:")
-        render_related_words(frayer_dict["related_words"], frayer_dict["id"])
-    if show_topics:
-        st.markdown("##### Topics:")
-        render_topics(frayer_dict["topics"], frayer_dict["id"])
+    col1, col2 = st.columns(2)
+    with col1:
+        if show_topics:
+            st.markdown("##### Topics:")
+            render_topics(frayer_dict["topics"], frayer_dict["id"])
+    with col2:
+        if show_related_words and frayer_dict["related_words"]:
+            st.markdown("##### Related words:")
+            render_related_words(
+                frayer_dict["related_words"], frayer_dict["id"]
+            )
 
 
 def safe_snake_case_filename(s: str = "word", extension: str = "txt") -> str:

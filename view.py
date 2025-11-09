@@ -52,6 +52,8 @@ else:
             key="show_non_examples",
         )
 
+        show_topics = st.checkbox("Topics", value=True, key="show_topics")
+
         if related_words_exist:
             show_related_words = st.checkbox(
                 "Related words", value=True, key="show_related_words"
@@ -59,11 +61,6 @@ else:
         else:
             show_related_words = False
 
-        show_topics = st.checkbox(
-            "Topics",
-            value=True,
-            key="show_topics",
-        )
     render_frayer(
         word.as_dict(),
         show_subject=True,
