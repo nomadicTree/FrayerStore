@@ -8,6 +8,8 @@ characteristics:
 - Could be initialised with arguments passed to the constructor or with default values
 - Could be accessed using `get` methods
 - Could be changed using `set` methods
+- In Python, instance-level attributes are typically defined within the constructor using `self.<attribute_name>`
+- In Python, attributes are accessed and modified using dot notation (e.g., `object.attribute_name`)
 examples:
 - |-
   Instance-level attributes declared in constructor (Python):
@@ -73,7 +75,7 @@ non_examples:
   ...
       def heal():
           heal_amount = 10 # local variable, not an attribute
-          self.health = self.health + heal_amount # self.health is an attribute
+          self.health = self.health + heal_amount # health is an attribute
   ```
 topics:
 - course: OCR H446
