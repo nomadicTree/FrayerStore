@@ -1,6 +1,7 @@
+from dataclasses import dataclass
+from typing import List
 import streamlit as st
 import yaml
-from dataclasses import dataclass
 from app_lib.repositories import get_all_subjects_courses_topics
 from app_lib.utils import render_frayer, safe_snake_case_filename, page_header
 
@@ -82,36 +83,73 @@ def word_input_form():
 
     word = st.text_input("Word")
     definition = st.text_area("Definition", height="content")
+
     characteristics = st.text_area(
         "Characteristics",
-        help="List characteristics, one per line.",
-        placeholder="Characteristic 1\nCharacteristic 2,\n...",
+        help="Separate multiple characteristics with a line containing only ---",
+        placeholder="Characteristic 1\n---\nCharacteristic 2",
         height="content",
     )
+
     examples = st.text_area(
         "Examples",
-        help="List examples, one per line.",
-        placeholder="Example 1\nExample 2,\n...",
+        help="Separate multiple examples with a line containing only ---",
+        placeholder=("Example 1\n" "---\n" "Example 2"),
         height="content",
     )
+
     non_examples = st.text_area(
         "Non-examples",
-        help="List non-examples, one per line.",
-        placeholder="Non-example 1\nNon-example 2,\n...",
+        help="Separate multiple non-examples with a line containing only ---",
+        placeholder="Non-example 1\n---\nNon-example 2",
         height="content",
     )
+
     yaml_data = {
         "word": word.strip(),
         "definition": definition.strip(),
         "characteristics": [
-            c.strip() for c in characteristics.split("\n") if c.strip()
+            c.strip() for c in characteristics.split("---") if c.strip()
         ],
-        "examples": [e.strip() for e in examples.split("\n") if e.strip()],
+        "examples": [e.strip() for e in examples.split("---") if e.strip()],
         "non_examples": [
-            ne.strip() for ne in non_examples.split("\n") if ne.strip()
+            ne.strip() for ne in non_examples.split("---") if ne.strip()
         ],
     }
+
     return yaml_data
+
+
+def format_multiline_strings(items: List[str]) -> List[str]:
+    """Format multiline inputs, preserving code blocks.
+
+    Args:
+        items: List of input strings, possibly containing code blocks.
+    Returns:
+        Formatted list of strings.
+    """
+
+    # --- Use a subclass of str and register a clean representer ---
+    class LiteralString(str):
+        pass
+
+    def literal_presenter(dumper, data):
+        """Force YAML literal style (|) for multiline strings."""
+        return dumper.represent_scalar(
+            "tag:yaml.org,2002:str", data, style="|"
+        )
+
+    yaml.add_representer(LiteralString, literal_presenter)
+
+    # Convert only multiline examples to literal block style
+    formatted_items = []
+    for i in items:
+        if "\n" in i:  # multiline -> use literal block
+            formatted_items.append(LiteralString(i))
+        else:  # single line -> leave plain
+            formatted_items.append(i)
+
+    return formatted_items
 
 
 # ----------------------------
@@ -139,6 +177,15 @@ def main():
     word_data["topics"] = yaml_topics
 
     st.subheader("YAML preview")
+
+    word_data["examples"] = format_multiline_strings(word_data["examples"])
+    word_data["non_examples"] = format_multiline_strings(
+        word_data["non_examples"]
+    )
+    word_data["characteristics"] = format_multiline_strings(
+        word_data["characteristics"]
+    )
+
     word_yaml = yaml.dump(
         word_data,
         sort_keys=False,
