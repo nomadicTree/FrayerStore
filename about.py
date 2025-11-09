@@ -20,8 +20,8 @@ def main():
     st.subheader("Frayer Models")
     st.markdown(
         """
-        Frayer Models are a graphical organiser for learning new vocabulary.
-        It presents the word along with its definition, characteristics, examples, and non-examples.
+        Frayer Models are graphical organisers for learning new vocabulary.
+        They present words along with definitions, characteristics, examples, and non-examples.
         Frayer Models are particularly useful for learning 'tier three' vocabulary—words that are subject-specific and not commonly used in everyday language.
         """
     )
