@@ -1,6 +1,8 @@
-from app_lib.utils import page_header, show_markdown_file
 from pathlib import Path
 import streamlit as st
+
+from app.core.utils.show_markdown import show_markdown_file
+from app.components.common import page_header
 
 PAGE_TITLE = "Planned Words"
 
