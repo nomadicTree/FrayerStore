@@ -1,5 +1,5 @@
 import streamlit as st
-from app_lib.utils import page_header
+from app.components.common import page_header
 
 PAGE_TITLE = "AI Usage"
 
