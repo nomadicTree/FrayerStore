@@ -5,7 +5,7 @@ from app_lib.repositories import (
     get_words_by_topic,
 )
 from app_lib.selection_helpers import select_subject, select_course
-from app_lib.utils import page_header, render_frayer
+from app.components.common import page_header
 
 PAGE_TITLE = "Course Glossary"
 
