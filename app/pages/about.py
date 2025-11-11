@@ -1,7 +1,7 @@
 import streamlit as st
-from app_lib.utils import page_header, render_frayer
-from app_lib.repositories import get_word_by_id
-from app_lib.models import Word
+from app.components.common import page_header
+from app.core.components.frayer import render_frayer_model
+from app.core.respositories.words_repo import get_word_full
 
 PAGE_TITLE = "About"
 
@@ -26,8 +26,13 @@ def main():
         """
     )
     with st.expander("Example Frayer Model", expanded=True):
-        example_word = Word(get_word_by_id(4))
-        render_frayer(example_word.as_dict())
+        example_word = get_word_full(4)
+        render_frayer_model(
+            example_word.versions[0],
+            example_word.word,
+            show_topics=False,
+            show_related_words=False,
+        )
 
     st.subheader("Why I am building this")
     st.markdown(
