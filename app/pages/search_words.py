@@ -5,6 +5,7 @@ import streamlit as st
 from app.core.respositories.words_repo import search_words
 from app.core.utils.strings import format_time_text
 from app.components.common import page_header
+from app.core.models.word_models import SearchResult
 
 # from app_lib.utils import apply_styles, render_frayer, format_time_text
 
@@ -12,30 +13,34 @@ from app.components.common import page_header
 PAGE_TITLE = "Search"
 
 
-def search_query(query: str) -> list[dict]:
+@st.cache_data(show_spinner=False)
+def search_query(query: str):
+    """Return matching words and search duration."""
     start_time = time.perf_counter()
-    found_words = search_words(query)
-    end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
-    return found_words, elapsed_time
+    results = search_words(query)
+    elapsed = time.perf_counter() - start_time
+    return results, elapsed
 
 
 def display_search_results(
-    results: list[dict], query: str, elapsed_time: float
-) -> None:
-    if elapsed_time is not None:
-        plural = "s" if len(results) != 1 else ""
-        formatted_time = format_time_text(elapsed_time)
-        st.caption(
-            f"Found {len(results)} result{plural} for {query!r} in {formatted_time}."
-        )
-    if results:
-        for word in results:
-            st.markdown(
-                f"[{word["word"]} – {word["subject_name"]}](/view?id={word["word_id"]})"
-            )
-    elif query:
+    results: list[SearchResult], query: str, elapsed: float
+):
+    if not query:
+        return
+
+    plural = "s" if len(results) != 1 else ""
+    st.caption(
+        f"Found {len(results)} result{plural} for {query!r} in {format_time_text(elapsed)}."
+    )
+
+    if not results:
         st.info(f"No results found for {query!r}.")
+        return
+
+    for r in results:
+        with st.container(border=True):
+            st.markdown(f"#### [{r.word}]({r.url})")
+            st.markdown(f"**{r.subject_name}**: {r.level_names or '—'}")
 
 
 def main():

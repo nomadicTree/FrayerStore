@@ -5,6 +5,8 @@ import yaml
 from app_lib.repositories import get_all_subjects_courses_topics
 from app_lib.utils import render_frayer, safe_snake_case_filename, page_header
 
+from app.components.common import page_header
+
 PAGE_TITLE = "Model Maker"
 
 

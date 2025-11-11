@@ -17,6 +17,18 @@ class RelatedWord:
         return f"/view?id={self.word_id}"
 
 
+@dataclass
+class SearchResult:
+    word_id: int
+    word: str
+    subject_name: str
+    level_names: str
+
+    @property
+    def url(self):
+        return f"/view?id={self.word_id}"
+
+
 class WordVersion:
     def __init__(
         self,

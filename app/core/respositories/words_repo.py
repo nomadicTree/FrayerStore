@@ -3,21 +3,26 @@ from app.core.db import get_db
 from app.core.models.course_model import Course
 from app.core.models.topic_model import Topic
 from app.core.models.level_model import Level
-from app.core.models.word_models import Word, WordVersion, RelatedWord
+from app.core.models.word_models import (
+    Word,
+    WordVersion,
+    RelatedWord,
+    SearchResult,
+)
 from app.core.models.subject_model import Subject
 
 
 def search_words(
-    query: str, subject_id=None, course_id=None, topic_id=None
-) -> list[dict]:
-    """Search for words by text and optional filters."""
+    query: str, subject_id=None, topic_id=None
+) -> list[SearchResult]:
+    """Search for words by text and optional filters, aggregating levels."""
     db = get_db()
     q = """
         SELECT
             word_id,
             word,
             MIN(subject_name) AS subject_name,
-            MIN(course_name) AS course_name
+            GROUP_CONCAT(DISTINCT level_name) AS level_names
         FROM vw_WordDetails
         WHERE word LIKE :query
     """
@@ -26,17 +31,29 @@ def search_words(
     if subject_id:
         q += " AND subject_id = :subject_id"
         params["subject_id"] = subject_id
-    if course_id:
-        q += " AND course_id = :course_id"
-        params["course_id"] = course_id
     if topic_id:
         q += " AND topic_id = :topic_id"
         params["topic_id"] = topic_id
 
-    q += " GROUP BY word_id, word ORDER BY word"
+    q += " GROUP BY word_id, word ORDER BY word COLLATE NOCASE"
 
     rows = db.execute(q, params).fetchall()
-    return [dict(r) for r in rows]
+
+    results = []
+
+    for r in rows:
+        level_names = r["level_names"]
+        if level_names:
+            level_names = level_names.replace(",", ", ")
+        results.append(
+            SearchResult(
+                word_id=r["word_id"],
+                word=r["word"],
+                subject_name=r["subject_name"],
+                level_names=level_names,
+            )
+        )
+    return results
 
 
 def get_related_words(word_id: int) -> list[RelatedWord]:
