@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
-from app_lib.utils import page_header, show_markdown_file
+from app.components.common import page_header
+from app.core.utils.show_markdown import show_markdown_file
 
 PAGE_TITLE = "Licensing"
 
