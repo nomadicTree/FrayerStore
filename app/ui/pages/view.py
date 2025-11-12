@@ -124,7 +124,7 @@ def main():
     st.markdown(f"Subject: **{word.subject.name}**")
 
     # --- determine selected key stage (from query param) ---
-    query_ks = get_query_param_single("ks")
+    query_ks = get_query_param_single("level")
 
     tab_labels = [label_for_version(v) for v in word.versions]
     tab_slugs = [slugify_label(lbl) for lbl in tab_labels]
@@ -142,7 +142,7 @@ def main():
     )
 
     # --- sync back to query params ---
-    st.query_params["ks"] = tab_slugs[tab_labels.index(selected_label)]
+    st.query_params["level"] = tab_slugs[tab_labels.index(selected_label)]
 
     # --- find selected version ---
     version = next(
