@@ -1,11 +1,25 @@
 import streamlit as st
 from app.ui.components.page_header import page_header
+from app.core.respositories.courses_repo import get_courses
+from app.ui.components.selection_helpers import select_course
+from app.core.respositories.words_repo import get_word_versions_for_course
+from app.ui.components.frayer import render_frayer_model
 
-PAGE_TITLE = "Topic Glossary"
+PAGE_TITLE = "Course Glossary"
 
 
 def main():
     page_header(PAGE_TITLE)
+
+    all_courses = get_courses()
+    course = select_course(all_courses)
+    word_versions = get_word_versions_for_course(course)
+    word_versions.sort()
+
+    for wv in word_versions:
+        with st.expander(wv.word, expanded=False):
+            render_frayer_model(wv)
+            st.link_button("View full details", wv.url)
 
 
 if __name__ == "__main__":
