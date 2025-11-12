@@ -3,12 +3,12 @@ from app.core.models.topic_model import Topic
 from app.core.models.course_model import Course
 
 
-def get_topics_for_course(course: Course, has_words: bool = False) -> list[Topic]:
+def get_topics_for_course(course: Course, only_with_words: bool = False) -> list[Topic]:
     """Return all topics for a given course.
 
     Args:
         course: The Course object to fetch topics for.
-        has_words: If True, only return topics that have one or more linked words.
+        only_with_words: If True, only return topics that have one or more linked words.
     """
     db = get_db()
 
@@ -24,7 +24,7 @@ def get_topics_for_course(course: Course, has_words: bool = False) -> list[Topic
     params = {"course_id": course.course_id}
 
     # Add optional filter for topics that have at least one linked word
-    if has_words:
+    if only_with_words:
         q += """
             AND EXISTS (
                 SELECT 1
