@@ -472,3 +472,61 @@ def get_word_version_by_id(wv_id: int) -> WordVersion | None:
         topics=topics,
         levels=levels,
     )
+
+
+def get_word_versions_for_topic(topic: Topic) -> list[WordVersion]:
+    db = get_db()
+
+    q = """
+        SELECT
+            wv.id AS wv_id,
+            wv.word_id,
+            w.word AS word,
+            s.id AS subject_id,
+            s.name AS subject_name,
+            wv.definition,
+            wv.characteristics,
+            wv.examples,
+            wv.non_examples
+        FROM WordVersionContexts wvc
+        JOIN WordVersions wv ON wvc.word_version_id = wv.id
+        JOIN Words w ON wv.word_id = w.id
+        JOIN Subjects s ON w.subject_id = s.id
+        WHERE wvc.topic_id = :topic_id
+        ORDER BY w.word COLLATE NOCASE;
+    """
+
+    rows = db.execute(q, {"topic_id": topic.topic_id}).fetchall()
+
+    results = []
+    for r in rows:
+        level_rows = db.execute(
+            """
+            SELECT l.id, l.name, l.description
+            FROM WordVersionLevels wvl
+            JOIN Levels l ON wvl.level_id = l.id
+            WHERE wvl.word_version_id = :wv_id
+            """,
+            {"wv_id": r["wv_id"]},
+        ).fetchall()
+
+        levels = [Level(l["id"], l["name"], l["description"]) for l in level_rows]
+
+        subject = Subject(r["subject_id"], r["subject_name"])
+        topics = get_word_topics_for_version(r["wv_id"], subject)
+
+        results.append(
+            WordVersion(
+                wv_id=r["wv_id"],
+                word=r["word"],
+                word_id=r["word_id"],
+                definition=r["definition"],
+                characteristics=r["characteristics"],
+                examples=r["examples"],
+                non_examples=r["non_examples"],
+                levels=levels,
+                topics=topics,
+            )
+        )
+
+    return results
