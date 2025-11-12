@@ -8,3 +8,15 @@ class Course:
         self.name = name
         self.subject = subject
         self.level = level
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Course):
+            return NotImplemented
+        return self.course_id == other.course_id
+
+    def __hash__(self) -> int:
+        return hash(self.course_id)
+
+    @property
+    def pk(self):
+        return self.course_id

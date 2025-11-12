@@ -8,6 +8,14 @@ class Topic:
         self.name = name
         self.course = course
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Topic):
+            return NotImplemented
+        return self.topic_id == other.topic_id
+
+    def __hash__(self) -> int:
+        return hash(self.topic_id)
+
     @property
     def url(self):
         subj = self.course.subject.name.replace(" ", "+")
@@ -17,3 +25,7 @@ class Topic:
     @property
     def label(self):
         return f"{self.code}: {self.name}"
+
+    @property
+    def pk(self):
+        return self.topic_id
