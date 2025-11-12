@@ -31,25 +31,21 @@ def display_search_result(result: "SearchResult") -> None:
         st.subheader(result.word)
         st.markdown(f"Subject: **{result.subject.name}**")
 
+        for version in result.versions:
+            # Use an expander instead of a modal
+            word_version = get_word_version_by_id(version["word_version_id"])
+            with st.expander(word_version.level_label, expanded=False):
+                with st.spinner("Loading version details..."):
+                    if word_version:
+                        render_frayer_model(word_version, show_word=False)
+                    else:
+                        st.warning("Version details not found.")
+
         st.link_button(
             label="View full details",
             url=result.url,
             width="content",
         )
-
-        for version in result.versions:
-            level_names = ", ".join(l.name for l in version["levels"])
-            expander_label = f"{level_names or 'Unspecified Level'}"
-
-            # Use an expander instead of a modal
-            with st.expander(expander_label, expanded=False):
-                with st.spinner("Loading version details..."):
-                    # Fetch full WordVersion details only when expanded
-                    word_version = get_word_version_by_id(version["word_version_id"])
-                    if word_version:
-                        render_frayer_model(word_version, show_word=False)
-                    else:
-                        st.warning("Version details not found.")
 
 
 def display_search_results(results: list[SearchResult], query: str, elapsed: float):
