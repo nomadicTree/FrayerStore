@@ -1,6 +1,8 @@
 import streamlit as st
+from app.core.models.word_models import WordVersionChoice
 from app.core.respositories.words_repo import get_word_full
 from app.ui.components.page_header import page_header
+from app.ui.components.selection_helpers import select_item
 from app.ui.components.frayer import (
     render_frayer_model,
 )
@@ -96,32 +98,12 @@ def main():
     st.header(word.word if opts["show_word_title"] else "❓")
     st.markdown(f"Subject: **{word.subject.name}**")
 
-    # --- determine selected key stage (from query param) ---
-    query_level = get_query_param_single("level")
+    choices = [WordVersionChoice(v) for v in word.versions]
 
-    tab_labels = [v.level_label() for v in word.versions]
-    tab_slugs = [v.level_slug() for v in word.versions]
+    selected_choice = select_item(items=choices, key="level", label="Level")
 
-    default_index = 0
-    if query_level and query_level in tab_slugs:
-        default_index = tab_slugs.index(query_level)
-
-    selected_label = st.radio(
-        "Key stage:",
-        tab_labels,
-        horizontal=True,
-        index=default_index,
-        key="level_tabs",
-    )
-
-    # --- sync back to query params ---
-    st.query_params["level"] = tab_slugs[tab_labels.index(selected_label)]
-
-    # --- find selected version ---
-    version = next(
-        (v for v in word.versions if v.level_label() == selected_label),
-        None,
-    )
+    # Retrieve the underlying WordVersion
+    version = selected_choice.version
 
     # --- render the selected version ---
     if version:
