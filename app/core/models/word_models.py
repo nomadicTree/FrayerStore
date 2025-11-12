@@ -3,7 +3,6 @@ import json
 from dataclasses import dataclass, field
 
 from urllib.parse import quote_plus
-import re
 from app.core.models.topic_model import Topic
 from app.core.models.level_model import Level
 from app.core.models.subject_model import Subject
@@ -29,7 +28,7 @@ class SearchResult(UrlMixin):
     versions: list = field(default_factory=list)
 
 
-class WordVersion(UrlMixin):
+class WordVersion:
     def __init__(
         self,
         wv_id,
@@ -65,13 +64,7 @@ class WordVersion(UrlMixin):
             return NotImplemented
         return self.word.lower() < other.word.lower()
 
-    def build_url(self, **params) -> str:
-        base = self.url
-        if not params:
-            return base
-        query = "&".join(f"{k}={quote_plus(str(v))}" for k, v in params.items())
-        return f"{base}&{query}"
-
+    @property
     def level_label(self) -> str:
         """Return a human-readable label for this WordVersion's levels."""
         levels = [l.name for l in self.levels]
@@ -84,11 +77,23 @@ class WordVersion(UrlMixin):
             return " and ".join(levels)
         return ", ".join(levels[:-1]) + f", and {levels[-1]}"
 
-    def level_slug(self) -> str:
-        label = self.level_label()
-        slug = re.sub(r"[ ,]+and[ ,]+", "-", label.lower())
-        slug = re.sub(r"[^a-z0-9]+", "-", slug).strip("-")
-        return quote_plus(slug)
+    @property
+    def url(self) -> str:
+        level_param = quote_plus(self.level_label)
+        return f"/view?id={self.word_id}&level={level_param}"
+
+
+class WordVersionChoice:
+    def __init__(self, version: WordVersion):
+        self.version = version
+
+    @property
+    def name(self) -> str:
+        return self.version.level_label
+
+    @property
+    def pk(self) -> str:
+        return self.version.wv_id
 
 
 class Word(UrlMixin):
