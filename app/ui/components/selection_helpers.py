@@ -1,5 +1,7 @@
 import streamlit as st
 
+from app.core.models.course_model import Course
+
 
 def select_item(items: list, key: str, label: str):
     """
@@ -56,3 +58,20 @@ def select_item(items: list, key: str, label: str):
         st.rerun()
 
     return selected_from_widget
+
+
+def select_course(available_courses: list[Course]):
+    subjects = sorted({c.subject for c in available_courses}, key=lambda s: s.name)
+    subject = select_item(subjects, "subject", "Select subject")
+
+    levels = sorted(
+        {c.level for c in available_courses if c.subject == subject},
+        key=lambda l: l.name,
+    )
+    level = select_item(levels, "level", "Select level")
+
+    filtered_courses = [
+        c for c in available_courses if c.subject == subject and c.level == level
+    ]
+    course = select_item(filtered_courses, "course", "Select course")
+    return course
