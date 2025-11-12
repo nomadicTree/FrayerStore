@@ -2,6 +2,8 @@ import json
 
 from dataclasses import dataclass, field
 
+from urllib.parse import quote_plus
+import re
 from app.core.models.topic_model import Topic
 from app.core.models.level_model import Level
 from app.core.models.subject_model import Subject
@@ -62,6 +64,31 @@ class WordVersion(UrlMixin):
         if not isinstance(other, WordVersion):
             return NotImplemented
         return self.word.lower() < other.word.lower()
+
+    def build_url(self, **params) -> str:
+        base = self.url
+        if not params:
+            return base
+        query = "&".join(f"{k}={quote_plus(str(v))}" for k, v in params.items())
+        return f"{base}&{query}"
+
+    def level_label(self) -> str:
+        """Return a human-readable label for this WordVersion's levels."""
+        levels = [l.name for l in self.levels]
+
+        if not levels:
+            return "All levels"
+        if len(levels) == 1:
+            return levels[0]
+        if len(levels) == 2:
+            return " and ".join(levels)
+        return ", ".join(levels[:-1]) + f", and {levels[-1]}"
+
+    def level_slug(self) -> str:
+        label = self.level_label()
+        slug = re.sub(r"[ ,]+and[ ,]+", "-", label.lower())
+        slug = re.sub(r"[^a-z0-9]+", "-", slug).strip("-")
+        return quote_plus(slug)
 
 
 class Word(UrlMixin):
