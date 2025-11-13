@@ -14,7 +14,3 @@ def page_header(title: str = ""):
     st.title("FrayerStore")
     if title:
         st.header(title)
-    apply_styles()
-
-
-
