@@ -9,15 +9,11 @@ from importer.config import CONFIG
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Import data into the Words database."
-    )
+    parser = argparse.ArgumentParser(description="Import data into the Words database.")
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser("levels", help="Import levels from levels.yaml")
-    subparsers.add_parser(
-        "subjects", help="Import subjects, courses, and topics"
-    )
+    subparsers.add_parser("subjects", help="Import subjects, courses, and topics")
     subparsers.add_parser(
         "words",
         help="Import words recursively from each subject's 'words' directory",
@@ -48,9 +44,7 @@ def main():
         if not os.path.exists(subjects_yaml_path):
             print(f"⚠️  subjects.yaml not found in {data_root}")
             return
-        import_subjects.import_subjects(
-            subjects_yaml_path, subjects_root, db_path
-        )
+        import_subjects.import_subjects(subjects_yaml_path, subjects_root, db_path)
 
     elif args.command == "words":
         if not os.path.exists(subjects_root):
@@ -64,9 +58,7 @@ def main():
         subjects_yaml_path = os.path.join(data_root, "subjects.yaml")
 
         import_levels.import_levels(levels_path, db_path)
-        import_subjects.import_subjects(
-            subjects_yaml_path, subjects_root, db_path
-        )
+        import_subjects.import_subjects(subjects_yaml_path, subjects_root, db_path)
         import_words.import_words(subjects_root, db_path)
         print("✅ All imports completed.")
 
