@@ -17,6 +17,14 @@ class Course:
     def __hash__(self) -> int:
         return hash(self.course_id)
 
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Course):
+            return NotImplemented
+        if self.level != other.level:
+            return self.level < other.level
+
+        return self.name.lower() < other.name.lower()
+
     @property
     def pk(self):
         return self.course_id
