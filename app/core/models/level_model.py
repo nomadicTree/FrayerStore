@@ -12,6 +12,11 @@ class Level:
     def __hash__(self) -> int:
         return hash(self.level_id)
 
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Level):
+            return NotImplemented
+        return self.name < other.name
+
     @property
     def pk(self):
         return self.level_id
