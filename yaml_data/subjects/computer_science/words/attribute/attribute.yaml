@@ -1,7 +1,6 @@
 word: Attribute
 levels: [KS5]
-definition: A variable associated either with a class (class-level) or an object created
-  from a class (instance-level).
+definition: A variable associated either with a class or an object created from a class.
 characteristics:
 - Can be either `public` or `private`, controlling access from outside the class
 - Class-level attributes are shared across all instances
