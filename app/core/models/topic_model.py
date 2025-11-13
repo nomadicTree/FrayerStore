@@ -1,4 +1,5 @@
 from app.core.models.course_model import Course
+import re
 
 
 class Topic:
@@ -22,10 +23,18 @@ class Topic:
         return self.code < other.code
 
     @property
+    def slug(self):
+        safe_code = self.code.replace(".", "-")
+        name = self.name.strip().lower()
+        slug = re.sub(r"[^a-z0-9]+", "-", name)
+        slug = slug.strip("-")
+        return f"#{safe_code}-{slug}"
+
+    @property
     def url(self):
-        subj = self.course.subject.name.replace(" ", "+")
+        subject = self.course.subject.name.replace(" ", "+")
         course = self.course.name.replace(" ", "+")
-        return f"/topic_glossary?subject={subj}&course={course}#{self.code}"
+        return f"/topic_glossary?subject={subject}&course={course}{self.slug}"
 
     @property
     def label(self):
