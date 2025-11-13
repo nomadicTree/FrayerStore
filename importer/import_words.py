@@ -8,6 +8,7 @@ from importer.db_utils import (
     get_or_create_level,
     link_word_to_topic,
     link_wordversion_to_level,
+    get_levels_for_courses,
     get_level_id,
     get_or_create_word_version_for_levels,
     prune_superset_word_versions,
@@ -43,6 +44,37 @@ def import_single_word(conn, path):
         print(f"⚠️  No levels specified for '{word_name}' — skipping.")
         return
 
+    topics_entries = data.get("topics", [])
+
+    # Extract all distinct courses referenced in this YAML
+    course_names = sorted({entry["course"].strip() for entry in topics_entries})
+
+    # Compute inferred levels from those courses
+    inferred_levels = get_levels_for_courses(conn, course_names)
+
+    declared_levels = set(levels)
+
+    # 🚨 VALIDATION
+    # Case 1: YAML missing some levels that courses imply
+    missing_in_declared = inferred_levels - declared_levels
+
+    if missing_in_declared:
+        print(f"❌ Level mismatch in '{word_name}' ({os.path.basename(path)})")
+        print(f"   Declared levels: {sorted(declared_levels)}")
+        print(f"   Topics imply:    {sorted(inferred_levels)}")
+        print(f"   Missing:         {sorted(missing_in_declared)}")
+        print("   → Fix your YAML to avoid mixed meanings.")
+        return
+
+    # Case 2: YAML contains levels that topics do not imply
+    extra_levels = declared_levels - inferred_levels
+    if extra_levels and inferred_levels:
+        print(
+            f"⚠️  '{word_name}' declares levels {sorted(extra_levels)} "
+            f"that are not implied by any topics."
+        )
+        return
+
     definition = (data.get("definition") or "").strip()
     characteristics = clean_list(data.get("characteristics", []))
     examples = clean_list(data.get("examples", []))
@@ -58,9 +90,7 @@ def import_single_word(conn, path):
     for name in levels:
         level_id = get_level_id(conn, name)
         if not level_id:
-            print(
-                f"❌ Level '{name}' not found in database. Run import_levels first."
-            )
+            print(f"❌ Level '{name}' not found in database. Run import_levels first.")
             return
         level_ids.append(level_id)
 
@@ -72,16 +102,12 @@ def import_single_word(conn, path):
         course_name = entry["course"].strip()
         codes = [str(c).strip() for c in entry.get("codes", [])]
         if not codes:
-            print(
-                f"⚠️  No topic codes for course '{course_name}' in '{word_name}'."
-            )
+            print(f"⚠️  No topic codes for course '{course_name}' in '{word_name}'.")
             continue
 
         course_id, subject_id = get_course_by_name(conn, course_name)
         if not course_id:
-            print(
-                f"⚠️  Course '{course_name}' not found for '{word_name}'. Skipping."
-            )
+            print(f"⚠️  Course '{course_name}' not found for '{word_name}'. Skipping.")
             continue
 
         # 1️⃣ Get or create the Word for this subject

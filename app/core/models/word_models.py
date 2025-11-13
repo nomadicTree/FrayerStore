@@ -45,9 +45,9 @@ class WordVersion:
         self.word = word
         self.word_id = word_id
         self.definition = definition
-        self.characteristics = json.loads(characteristics) or "[]"
-        self.examples = json.loads(examples) or "[]"
-        self.non_examples = json.loads(non_examples) or "[]"
+        self.characteristics = self._ensure_list(characteristics)
+        self.examples = self._ensure_list(examples)
+        self.non_examples = self._ensure_list(non_examples)
         self.levels = levels
         self.topics = topics
 
@@ -81,6 +81,24 @@ class WordVersion:
     def url(self) -> str:
         level_param = quote_plus(self.level_label)
         return f"/view?id={self.word_id}&level={level_param}"
+
+    def _ensure_list(self, value):
+        # Case 1: Already a real list (preview mode)
+        if isinstance(value, list):
+            return value
+
+        # Case 2: None or empty string → treat as empty list
+        if not value:
+            return []
+
+        # Case 3: A JSON string → decode it
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return parsed
+            return []
+        except Exception:
+            return []
 
 
 class WordVersionChoice:

@@ -59,9 +59,7 @@ def get_or_create_course(conn, subject_id, name, level_id=None):
 
 def get_course_by_name(conn, name):
     """Return (course_id, subject_id) for a course name, or (None, None)."""
-    cur = conn.execute(
-        "SELECT id, subject_id FROM Courses WHERE name = ?", (name,)
-    )
+    cur = conn.execute("SELECT id, subject_id FROM Courses WHERE name = ?", (name,))
     row = cur.fetchone()
     return row if row else (None, None)
 
@@ -258,9 +256,7 @@ def prune_superset_word_versions(conn, word_id: int) -> int:
                 pruned_ids.add(vid_a)
 
     for vid in pruned_ids:
-        conn.execute(
-            "DELETE FROM WordVersionLevels WHERE word_version_id = ?", (vid,)
-        )
+        conn.execute("DELETE FROM WordVersionLevels WHERE word_version_id = ?", (vid,))
         conn.execute(
             "DELETE FROM WordVersionContexts WHERE word_version_id = ?", (vid,)
         )
@@ -272,3 +268,26 @@ def prune_superset_word_versions(conn, word_id: int) -> int:
             f"🧹 Pruned {len(pruned_ids)} superseded WordVersions for word_id={word_id}"
         )
     return len(pruned_ids)
+
+
+def get_levels_for_courses(conn, course_names: list[str]) -> set[str]:
+    """
+    Given a list of course names, return the set of level names they imply.
+    """
+    inferred_levels = set()
+
+    for course_name in course_names:
+        row = conn.execute(
+            """
+            SELECT l.name AS level_name
+            FROM Courses c
+            JOIN Levels l ON c.level_id = l.id
+            WHERE c.name = ?
+            """,
+            (course_name,),
+        ).fetchone()
+
+        if row:
+            inferred_levels.add(row["level_name"])
+
+    return inferred_levels

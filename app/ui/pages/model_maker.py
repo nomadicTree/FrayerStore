@@ -1,12 +1,15 @@
-from dataclasses import dataclass
 from typing import List
 import streamlit as st
+import json
 import yaml
 from app.ui.components.selection_helpers import select_courses
 from app.ui.components.page_header import page_header
 from app.ui.components.frayer import render_frayer_model
 from app.core.utils.strings import safe_snake_case_filename
 from app.core.respositories.courses_repo import get_courses
+from app.core.respositories.topics_repo import get_topics_for_course
+from app.core.models.topic_model import Topic
+from app.core.models.word_models import WordVersion
 
 PAGE_TITLE = "Model Maker"
 
@@ -84,19 +87,19 @@ def format_multiline_strings(items: List[str]) -> List[str]:
     return formatted_items
 
 
-def select_topics(course_topics):
-    """Return a dict mapping course -> list of selected topic codes"""
-    selected_topics = {}
-    for course, topics in course_topics.items():
-        codes = st.multiselect(
-            f"Select topics for {course}",
-            options=[t.code for t in topics],
-            format_func=lambda code: next(
-                f"{t.code} {t.name}" for t in topics if t.code == code
-            ),
-        )
-        selected_topics[course] = codes
+def select_topics_for_course(course) -> list[Topic]:
+    available_topics = get_topics_for_course(course)
+    selected_topics = st.multiselect(
+        f"Select topics for {course.name}",
+        options=available_topics,
+        format_func=lambda t: t.label,
+    )
     return selected_topics
+
+
+def select_topics(available_courses):
+    """Return a dict mapping course -> list of selected topic codes"""
+    return {c: select_topics_for_course(c) for c in available_courses}
 
 
 # ----------------------------
@@ -105,21 +108,22 @@ def select_topics(course_topics):
 def main():
     page_header(PAGE_TITLE)
     available_courses = get_courses()
-    courses = select_courses(available_courses)
-
-    selected_topics = None
+    selected_subject, selected_courses = select_courses(available_courses)
+    selected_topics = select_topics(selected_courses)
     st.divider()
 
     # Build YAML-ready topics
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     with col1:
         st.header("Word data input")
         word_data = word_input_form()
 
+    yaml_levels = [course.level.name for course in selected_courses]
+    word_data["levels"] = yaml_levels
     yaml_topics = [
-        {"course": course, "codes": sorted(codes)}
-        for course, codes in selected_topics.items()
-        if codes
+        {"course": course.name, "codes": sorted(t.code for t in topics)}
+        for course, topics in selected_topics.items()
+        if topics
     ]
     word_data["topics"] = yaml_topics
 
@@ -145,13 +149,21 @@ def main():
             file_name=safe_snake_case_filename(word_data["word"], "yaml"),
         )
 
+    preview_word = WordVersion(
+        wv_id=0,
+        word=word_data["word"],
+        word_id=0,
+        definition=word_data["definition"],
+        characteristics=word_data["characteristics"],
+        examples=word_data["examples"],
+        non_examples=word_data["non_examples"],
+        topics=[],
+        levels=[],
+    )
     st.subheader("Frayer preview")
-    word_data["id"] = 0  # Dummy ID for preview
-    with st.expander(word_data["word"], expanded=False):
+    with st.expander(preview_word.word, expanded=True):
         render_frayer_model(
-            word_data,
-            show_link=False,
-            show_subject=False,
+            preview_word,
             show_topics=False,
             show_related_words=False,
         )
