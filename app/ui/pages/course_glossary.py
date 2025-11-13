@@ -14,10 +14,10 @@ def main():
 
     all_courses = get_courses()
     course = select_course(all_courses)
-    word_versions = get_word_versions_for_course(course)
-    word_versions.sort()
+    course_word_versions = get_word_versions_for_course(course)
+    course_word_versions.sort()
 
-    for wv in word_versions:
+    for wv in course_word_versions:
         with st.expander(wv.word, expanded=False):
             render_frayer_model(wv)
             details_button(wv.url)
