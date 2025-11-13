@@ -2,7 +2,6 @@
 
 import time
 import streamlit as st
-import streamlit_antd_components as sac
 from app.core.respositories.words_repo import search_words, get_word_version_by_id
 from app.core.utils.strings import format_time_text
 from app.core.models.word_models import SearchResult
