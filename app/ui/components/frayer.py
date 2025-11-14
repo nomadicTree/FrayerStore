@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from app.core.models.word_models import WordVersion, RelatedWord
+from app.core.models.word_models import WordVersion, RelatedWord, Word
 
 
 def render_related_words(related_words: list[RelatedWord], word_id: int):
@@ -115,39 +115,51 @@ def render_frayer_model(
     show_non_examples=True,
     show_related_words=False,
 ):
-    if show_word:
-        st.subheader(word.word)
     col1, col2 = st.columns(2, border=True)
     with col1:
-        st.markdown("#### Definition")
+        st.markdown("**Definition**")
         if show_definition:
             st.write(word.definition)
         else:
             blank_box()
     with col2:
-        st.markdown("#### Characteristics")
+        st.markdown("**Characteristics**")
         if show_characteristics:
             render_list(word.characteristics)
         else:
             blank_box()
+
+    displayed_word = word.word if show_word else "❓"
+    st.html(f"<div class='frayer-word'>{displayed_word}</div>")
     col1, col2 = st.columns(2, border=True)
     with col1:
-        st.markdown("#### Examples")
+        st.markdown("**Examples**")
         if show_examples:
             render_list(word.examples)
         else:
             blank_box()
     with col2:
-        st.markdown("#### Non-examples")
+        st.markdown("**Non-examples**")
         if show_non_examples:
             render_list(word.non_examples)
         else:
             blank_box()
 
     if show_related_words and related_words:
-        st.markdown("##### Related words:")
+        st.divider()
+        st.markdown("**Related words:**")
         render_related_words(related_words, word.word_id)
 
     if show_topics:
-        st.markdown("##### Topics:")
+        st.divider()
+        st.markdown("**Topics:**")
         render_topics(word)
+
+
+def render_level_definitions(word: Word):
+    items = []
+    for v in word.versions:
+        definition = (v.definition or "").strip()
+        items.append(f"**{v.level_label}:** {definition}")
+
+    st.markdown("\n".join(f"- {item}" for item in items))
