@@ -6,11 +6,7 @@ def safe_snake_case_filename(s: str = "word", extension: str = "txt") -> str:
     # Normalize unicode characters to ASCII equivalents
     if len(s) == 0:
         s = "word"
-    s = (
-        unicodedata.normalize("NFKD", s)
-        .encode("ascii", "ignore")
-        .decode("ascii")
-    )
+    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
 
     # Replace illegal filename characters with underscore
     s = re.sub(r'[\/\\\:\*\?"<>\|]', "_", s)
@@ -28,7 +24,7 @@ def safe_snake_case_filename(s: str = "word", extension: str = "txt") -> str:
     s = re.sub(r"_+", "_", s)
 
     # Strip leading/trailing underscores
-    return f"{s.strip("_")}.{extension}"
+    return f"{s.strip('_')}.{extension}"
 
 
 def format_time_text(elapsed_time: float) -> str:
