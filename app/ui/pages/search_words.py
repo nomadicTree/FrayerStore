@@ -2,12 +2,12 @@
 
 import time
 import streamlit as st
-from app.core.respositories.words_repo import search_words, get_word_version_by_id
+from app.core.respositories.words_repo import search_words
 from app.core.utils.strings import format_time_text
-from app.core.models.word_models import SearchResult
+from app.core.models.word_models import Word
 from app.ui.components.page_header import page_header
-from app.ui.components.frayer import render_frayer_model
 from app.ui.components.buttons import details_button
+from app.ui.components.frayer import render_level_definitions
 
 PAGE_TITLE = "Search"
 
@@ -21,23 +21,24 @@ def search_query(query: str):
     return results, elapsed
 
 
-def display_search_result(result: "SearchResult") -> None:
+def display_search_result(result: Word) -> None:
     """Display a single search result with expanders for each WordVersion."""
-    st.subheader(result.word)
-    st.markdown(f"Subject: **{result.subject.name}**")
+    with st.container(border=True):
+        course_names = ", ".join(c.name for c in sorted(result.courses))
+        st.html(
+            f"""
+            <div class="search-title-block">
+            <div class="search-word">{result.word}</div>
+            <div class="search-caption">{result.subject.name}: {course_names}</div>
+        </div>
+        """
+        )
 
-    for version in result.versions:
-        word_version = get_word_version_by_id(version["word_version_id"])
-        with st.expander(word_version.level_label, expanded=False):
-            with st.spinner("Loading version details..."):
-                if word_version:
-                    render_frayer_model(word_version, show_word=False)
-                else:
-                    st.warning("Version details not found.")
-    details_button(result.url)
+        render_level_definitions(result)
+        details_button(result.url)
 
 
-def display_search_results(results: list[SearchResult], query: str, elapsed: float):
+def display_search_results(results: list[Word], query: str, elapsed: float):
     if not query:
         return
 
@@ -52,7 +53,6 @@ def display_search_results(results: list[SearchResult], query: str, elapsed: flo
 
     for r in results:
         display_search_result(r)
-        st.divider()
 
 
 def main():
