@@ -1,5 +1,5 @@
 import streamlit as st
-from app.core.models.word_models import WordVersionChoice
+from app.core.models.word_models import WordVersionChoice, WordVersion
 from app.core.respositories.words_repo import get_word_full
 from app.ui.components.page_header import page_header
 from app.ui.components.selection_helpers import select_item
@@ -44,13 +44,16 @@ def get_query_param_single(name: str) -> str | None:
 # --------------------------------------------------------------------
 # Sidebar rendering
 # --------------------------------------------------------------------
-def render_sidebar(word) -> dict:
+def render_sidebar(word) -> (WordVersion, dict):
     """Render sidebar controls and return user display preferences."""
     with st.sidebar:
-        st.header("Display Options")
+        choices = [WordVersionChoice(v) for v in word.versions]
+        selected_level = select_item(items=choices, key="level", label="Select level")
+        version = selected_level.version
 
+        st.write("Toggle visibility:")
         options = {
-            "show_word_title": st.checkbox("Word", value=True, key="show_word"),
+            "show_word": st.checkbox("Word", value=True, key="show_word"),
             "show_definition": st.checkbox(
                 "Definition", value=True, key="show_definition"
             ),
@@ -80,43 +83,33 @@ def render_sidebar(word) -> dict:
             key="show_topics",
         )
 
-        return options
+        return version, options
 
 
 # --------------------------------------------------------------------
 # Main view
 # --------------------------------------------------------------------
 def main():
-    page_header()
     word = get_word_from_query_params()
     if word is None:
         st.stop()
 
-    opts = render_sidebar(word)
+    version, view_options = render_sidebar(word)
 
-    # --- word header ---
-    st.header(word.word if opts["show_word_title"] else "❓")
-    st.markdown(f"Subject: **{word.subject.name}**")
+    displayed_word_header = version.word if view_options["show_word"] else "❓"
+    page_header("Frayer Model", f"**{word.subject.name}:** {displayed_word_header}")
 
-    choices = [WordVersionChoice(v) for v in word.versions]
-
-    selected_choice = select_item(items=choices, key="level", label="Select level")
-
-    # Retrieve the underlying WordVersion
-    version = selected_choice.version
-
-    # --- render the selected version ---
     if version:
         render_frayer_model(
             version,
-            show_word=False,
+            show_word=view_options["show_word"],
             related_words=word.related_words,
-            show_topics=opts["show_topics"],
-            show_definition=opts["show_definition"],
-            show_characteristics=opts["show_characteristics"],
-            show_examples=opts["show_examples"],
-            show_non_examples=opts["show_non_examples"],
-            show_related_words=opts["show_related_words"],
+            show_topics=view_options["show_topics"],
+            show_definition=view_options["show_definition"],
+            show_characteristics=view_options["show_characteristics"],
+            show_examples=view_options["show_examples"],
+            show_non_examples=view_options["show_non_examples"],
+            show_related_words=view_options["show_related_words"],
         )
 
 
