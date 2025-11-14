@@ -11,16 +11,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 PAGES_DIR = Path(__file__).resolve().parent / "ui/pages"
 
 pages = {
-    "Frayer Models": [
+    "FrayerStore": [
         st.Page(
             PAGES_DIR / "search_words.py",
             title="Search",
             icon="🔎",
             default=True,
         ),
-        st.Page(
-            PAGES_DIR / "topic_glossary.py", title="Topic Glossary", icon="📄"
-        ),
+        st.Page(PAGES_DIR / "topic_glossary.py", title="Topic Glossary", icon="📄"),
         st.Page(
             PAGES_DIR / "course_glossary.py",
             title="Course Glossary",
@@ -31,9 +29,7 @@ pages = {
         st.Page(PAGES_DIR / "about.py", title="About", icon="ℹ️"),
         st.Page(PAGES_DIR / "ai_usage.py", title="AI Usage", icon="💻"),
         st.Page(PAGES_DIR / "license.py", title="Licensing", icon="⚖️"),
-        st.Page(
-            PAGES_DIR / "planned_words.py", title="Planned Words", icon="📝"
-        ),
+        st.Page(PAGES_DIR / "planned_words.py", title="Planned Words", icon="📝"),
     ],
     "Utilities": [
         st.Page(PAGES_DIR / "model_maker.py", title="Model Maker", icon="🛠️"),
