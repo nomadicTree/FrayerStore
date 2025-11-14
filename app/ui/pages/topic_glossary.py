@@ -11,9 +11,10 @@ PAGE_TITLE = "Topic Glossary"
 
 
 def main():
-    page_header(PAGE_TITLE)
     all_courses = get_courses()
-    course = select_course(all_courses)
+    with st.sidebar:
+        course = select_course(all_courses)
+    page_header(PAGE_TITLE, f"**{course.subject.name}:** {course.name}")
     topics = get_topics_for_course(course, only_with_words=True)
     for topic in topics:
         st.subheader(topic.label)
