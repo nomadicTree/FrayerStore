@@ -1,8 +1,7 @@
 import json
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from urllib.parse import quote_plus
 from app.core.models.topic_model import Topic
 from app.core.models.level_model import Level
 from app.core.models.subject_model import Subject
@@ -135,6 +134,7 @@ class Word:
     subject: Subject
     versions: list[WordVersion]
     related_words: list[RelatedWord]
+    synonyms: list[str] = field(default_factory=list)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Word):
