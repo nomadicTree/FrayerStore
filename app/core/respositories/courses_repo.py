@@ -14,8 +14,10 @@ def get_courses() -> list[Course]:
         SELECT
             c.id AS course_id,
             c.name AS course_name,
+            c.slug as course_slug,
             s.id AS subject_id,
             s.name AS subject_name,
+            s.slug as subject_slug,
             l.id AS level_id,
             l.name AS level_name,
             l.description AS level_description
@@ -28,15 +30,22 @@ def get_courses() -> list[Course]:
 
     courses = []
     for r in rows:
-        subject = Subject(r["subject_id"], r["subject_name"])
+        subject = Subject(
+            pk=r["subject_id"], name=r["subject_name"], slug=r["subject_slug"]
+        )
         level = (
-            Level(r["level_id"], r["level_name"], r["level_description"])
+            Level(
+                pk=r["level_id"],
+                name=r["level_name"],
+                description=r["level_description"],
+            )
             if r["level_id"]
             else None
         )
         course = Course(
-            course_id=r["course_id"],
+            pk=r["course_id"],
             name=r["course_name"],
+            slug=r["course_slug"],
             subject=subject,
             level=level,
         )
