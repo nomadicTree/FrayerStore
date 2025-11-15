@@ -5,7 +5,7 @@ from app.core.models.course_model import Course
 
 @dataclass(eq=False, order=False)
 class Topic:
-    topic_id: int
+    pk: int
     code: str
     name: str
     course: Course
@@ -13,7 +13,7 @@ class Topic:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topic):
             return NotImplemented
-        return self.topic_id == other.topic_id
+        return self.pk == other.pk
 
     def __hash__(self) -> int:
         return hash(self.topic_id)
@@ -40,7 +40,3 @@ class Topic:
     @property
     def label(self):
         return f"{self.code}: {self.name}"
-
-    @property
-    def pk(self):
-        return self.topic_id

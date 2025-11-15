@@ -12,7 +12,7 @@ from app.core.models.course_model import Course
 class UrlMixin:
     @property
     def url(self):
-        return f"/view?id={self.word_id}"
+        return f"/view?id={self.pk}"
 
 
 @dataclass
@@ -23,7 +23,7 @@ class RelatedWord(UrlMixin):
 
 @dataclass(eq=False, order=False)
 class WordVersion:
-    wv_id: int
+    pk: int
     word: str
     word_id: int
     definition: str
@@ -42,10 +42,10 @@ class WordVersion:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, WordVersion):
             return NotImplemented
-        return self.wv_id == other.wv_id
+        return self.pk == other.pk
 
     def __hash__(self) -> int:
-        return hash(self.wv_id)
+        return hash(self.pk)
 
     def __lt__(self, other):
         if not isinstance(other, WordVersion):
@@ -68,7 +68,7 @@ class WordVersion:
     @property
     def url(self) -> str:
         level_param = quote_plus(self.level_label)
-        return f"/view?id={self.word_id}&level={level_param}"
+        return f"/view?id={self.pk}&level={level_param}"
 
     @property
     def courses(self) -> set[Course]:
@@ -101,14 +101,10 @@ class WordVersionChoice:
     def name(self) -> str:
         return self.version.level_label
 
-    @property
-    def pk(self) -> str:
-        return self.version.wv_id
-
 
 @dataclass(eq=False, order=False)
 class Word(UrlMixin):
-    word_id: int
+    pk: int
     word: str
     subject: Subject
     versions: list[WordVersion]
@@ -117,10 +113,10 @@ class Word(UrlMixin):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Word):
             return NotImplemented
-        return self.word_id == other.word_id
+        return self.pk == other.pk
 
     def __hash__(self) -> int:
-        return hash(self.wv_id)
+        return hash(self.pk)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Word):
