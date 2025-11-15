@@ -17,7 +17,7 @@ def get_levels() -> list[Level]:
 
     levels = [
         Level(
-            level_id=r["id"],
+            pk=r["id"],
             name=r["name"],
             description=r["description"],
         )
@@ -46,7 +46,7 @@ def get_levels_for_subject(subject_id) -> list[Level]:
 
     return [
         Level(
-            level_id=r["id"],
+            pk=r["id"],
             name=r["name"],
             description=r["description"],
         )
