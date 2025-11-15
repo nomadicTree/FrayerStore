@@ -88,6 +88,8 @@ def select_item(
     # STEP 6 — ALWAYS sync session → query params for global selectors
     if prefix == "global":
         st.query_params[key] = st.session_state[session_key]
+        if key not in st.query_params:
+            st.rerun()
 
     return selected_from_widget
 
