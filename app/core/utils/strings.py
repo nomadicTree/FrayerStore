@@ -40,3 +40,11 @@ def format_time_text(elapsed_time: float) -> str:
         return f"{elapsed_time * 1_000_000:.1f} µs"
     else:
         return f"{elapsed_time * 1_000:.3f} ms"
+
+
+def normalise_synonym(s: str) -> str:
+    # If the whole string is uppercase, keep it as is.
+    if s.isupper():
+        return s
+    # Otherwise use lowercase.
+    return s.lower()

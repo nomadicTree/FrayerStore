@@ -284,7 +284,7 @@ def get_word_text_and_slug(word_id: int) -> tuple[str, str] | None:
 
 def get_synonyms_for_word(word_id: int) -> list[str]:
     db = get_db()
-    q = "SELECT synonym FROM Synonyms WHERE word_id = ? ORDER BY synonym COLLATE NOCASE"
+    q = "SELECT synonym FROM Synonyms WHERE word_id = ? ORDER BY synonym"
     rows = db.execute(q, (word_id,)).fetchall()
     return [r["synonym"] for r in rows]
 

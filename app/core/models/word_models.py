@@ -6,6 +6,7 @@ from app.core.models.topic_model import Topic
 from app.core.models.level_model import Level
 from app.core.models.subject_model import Subject
 from app.core.models.course_model import Course
+from app.core.utils.strings import normalise_synonym
 
 
 @dataclass
@@ -170,8 +171,15 @@ class Word:
     def synonyms_str_bold(self, highlight: str | None = None) -> str:
         if not self.synonyms:
             return ""
+
         highlight = (highlight or "").lower()
-        return ", ".join(
-            f"**{s.lower()}**" if s.lower() == highlight else s.lower()
-            for s in sorted(self.synonyms)
-        )
+
+        processed = []
+        for s in sorted(self.synonyms):
+            norm = normalise_synonym(s)
+
+            # match is always checked lowercased
+            display = f"**{norm}**" if norm.lower() == highlight else norm
+            processed.append(display)
+
+        return ", ".join(processed)
