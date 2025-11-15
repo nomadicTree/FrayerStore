@@ -74,7 +74,7 @@ def get_or_create_subject(conn: sqlite3.Connection, name: str) -> int:
     return cur.lastrowid
 
 
-def get_or_create_level(conn, name: str, description: str) -> int:
+def get_or_create_level(conn, name: str, description: str | None = None) -> int:
     row = conn.execute(
         "SELECT id, description FROM Levels WHERE name = ?", (name,)
     ).fetchone()
