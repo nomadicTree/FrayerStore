@@ -24,7 +24,7 @@ def get_topics_for_course(course: Course, only_with_words: bool = False) -> list
         FROM Topics AS t
         WHERE t.course_id = :course_id
     """
-    params = {"course_id": course.course_id}
+    params = {"course_id": course.pk}
 
     # Add optional filter for topics that have at least one linked word
     if only_with_words:
@@ -44,7 +44,7 @@ def get_topics_for_course(course: Course, only_with_words: bool = False) -> list
 
     topics = [
         Topic(
-            topic_id=r["topic_id"],
+            pk=r["topic_id"],
             code=r["topic_code"],
             name=r["topic_name"],
             course=course,
