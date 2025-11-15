@@ -12,27 +12,43 @@ def select_item(
     default_item=None,
 ):
     """
-    - For prefix="global":
-        * uses query params only on first initialisation
-        * keeps query params in sync with selection
-    - For prefix="view":
-        * ignores query params altogether
-        * purely session-state driven
+    Single-select version aligned with select_items():
+    - prefix="global": URL only initializes once; then session dominates.
+    - prefix="view": ignores query params entirely.
+    - Stores slugs, not PKs.
     """
+
     if not items:
         st.warning(f"No options available for '{label}'.")
         return None
 
+    # Build lookup
     slug_map = {item.slug: item for item in items}
     session_key = f"{prefix}_{key}"
 
-    # Only global selectors care about query params
-    query_value = st.query_params.get(key) if prefix == "global" else None
+    # ---------------------------------------------------------
+    # STEP 1 — Query param only used for GLOBAL first init
+    # ---------------------------------------------------------
+    if prefix == "global":
+        qp = st.query_params.get(key)
+    else:
+        qp = None
 
-    # 1. INITIALISE: session ← query (first load) OR default
-    if session_key not in st.session_state:
-        if query_value and query_value in slug_map:
-            st.session_state[session_key] = query_value
+    # qp may be a string or a list; treat consistently
+    if isinstance(qp, list):
+        qp_slug = qp[0] if qp else None
+    else:
+        qp_slug = qp.strip() if isinstance(qp, str) else None
+
+    # ---------------------------------------------------------
+    # STEP 2 — Initialisation
+    # ---------------------------------------------------------
+    original_slug = st.session_state.get(session_key)
+
+    if original_slug is None:
+        # Initial load, choose the best initial value
+        if qp_slug and qp_slug in slug_map:
+            st.session_state[session_key] = qp_slug
         elif default_item:
             st.session_state[session_key] = default_item.slug
         else:
@@ -40,30 +56,38 @@ def select_item(
 
     selected_slug = st.session_state[session_key]
 
-    # 2. STALE CHECK
+    # ---------------------------------------------------------
+    # STEP 3 — Clean stale values
+    # ---------------------------------------------------------
     if selected_slug not in slug_map:
+        # fallback to default or first item
         selected_slug = default_item.slug if default_item else items[0].slug
         st.session_state[session_key] = selected_slug
 
-    selected_item = slug_map[selected_slug]
+    selected_obj = slug_map[selected_slug]
 
-    # 3. RENDER
+    # ---------------------------------------------------------
+    # STEP 4 — Render selector driven by session state
+    # ---------------------------------------------------------
     selected_from_widget = st.selectbox(
         label,
         items,
-        index=items.index(selected_item),
+        index=items.index(selected_obj),
         format_func=lambda i: i.label,
         key=f"{prefix}_{key}_widget",
     )
 
-    # 4. SESSION ← widget
-    if selected_from_widget.slug != st.session_state[session_key]:
-        st.session_state[session_key] = selected_from_widget.slug
+    new_slug = selected_from_widget.slug
 
-    # 5. SESSION → QUERY
+    # ---------------------------------------------------------
+    # STEP 5 — Update session and then query params (global only)
+    # ---------------------------------------------------------
+    if new_slug != selected_slug:
+        st.session_state[session_key] = new_slug
+
+    # STEP 6 — ALWAYS sync session → query params for global selectors
     if prefix == "global":
-        if st.query_params.get(key) != selected_from_widget.slug:
-            st.query_params[key] = selected_from_widget.slug
+        st.query_params[key] = st.session_state[session_key]
 
     return selected_from_widget
 
@@ -111,14 +135,17 @@ def select_items(
     else:
         query_slugs = []
 
-    # 1. INITIALISE session state
-    if session_key not in st.session_state:
-        if query_slugs:
-            valid_slugs = [s for s in query_slugs if s in slug_map]
-            st.session_state[session_key] = valid_slugs
-        else:
-            st.session_state[session_key] = []
+    original_slugs = st.session_state.get(session_key)
 
+    # 1. INITIALISE session state
+    if original_slugs is None:
+        valid_slugs = [s for s in query_slugs if s in slug_map]
+        st.session_state[session_key] = valid_slugs
+        st.session_state[session_key] = []
+        original_slugs = valid_slugs
+
+    cleaned_slugs = [s for s in original_slugs if s in slug_map]
+    st.session_state[session_key] = cleaned_slugs
     selected_slugs = st.session_state[session_key]
 
     # 2. Remove stale slugs
