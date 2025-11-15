@@ -1,6 +1,6 @@
 import json
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from urllib.parse import quote_plus
 from app.core.models.topic_model import Topic
@@ -21,30 +21,25 @@ class RelatedWord(UrlMixin):
     word: str
 
 
+@dataclass(eq=False, order=False)
 class WordVersion:
-    def __init__(
-        self,
-        wv_id,
-        word,
-        word_id,
-        definition,
-        characteristics,
-        examples,
-        non_examples,
-        topics: list[Topic],
-        levels: list[Level],
-    ):
-        self.wv_id = wv_id
-        self.word = word
-        self.word_id = word_id
-        self.definition = definition
-        self.characteristics = self._ensure_list(characteristics)
-        self.examples = self._ensure_list(examples)
-        self.non_examples = self._ensure_list(non_examples)
-        self.levels = levels
-        self.topics = topics
+    wv_id: int
+    word: str
+    word_id: int
+    definition: str
+    characteristics: list
+    examples: list
+    non_examples: list
+    topics: list[Topic]
+    levels: list[Level]
 
-    def __eq__(self, other: object):
+    def __post_init__(self):
+        # Normalise list-like fields
+        self.characteristics = self._ensure_list(self.characteristics)
+        self.examples = self._ensure_list(self.examples)
+        self.non_examples = self._ensure_list(self.non_examples)
+
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, WordVersion):
             return NotImplemented
         return self.wv_id == other.wv_id
@@ -111,28 +106,26 @@ class WordVersionChoice:
         return self.version.wv_id
 
 
+@dataclass(eq=False, order=False)
 class Word(UrlMixin):
-    def __init__(
-        self,
-        word_id,
-        word,
-        subject: Subject,
-        versions: list[WordVersion],
-        related_words: list[RelatedWord],
-    ):
-        self.word_id = word_id
-        self.word = word
-        self.subject = subject
-        self.versions = versions
-        self.related_words = related_words
+    word_id: int
+    word: str
+    subject: Subject
+    versions: list[WordVersion]
+    related_words: list[RelatedWord]
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Word):
             return NotImplemented
         return self.word_id == other.word_id
 
     def __hash__(self) -> int:
-        return hash(self.word_id)
+        return hash(self.wv_id)
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Word):
+            return NotImplemented
+        return self.word.lower() < other.word.lower()
 
     @property
     def courses(self) -> set[Course]:

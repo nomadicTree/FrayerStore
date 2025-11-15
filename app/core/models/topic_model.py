@@ -1,13 +1,14 @@
-from app.core.models.course_model import Course
 import re
+from dataclasses import dataclass
+from app.core.models.course_model import Course
 
 
+@dataclass(eq=False, order=False)
 class Topic:
-    def __init__(self, topic_id: int, code: str, name: str, course: Course):
-        self.topic_id = topic_id
-        self.code = code
-        self.name = name
-        self.course = course
+    topic_id: int
+    code: str
+    name: str
+    course: Course
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Topic):

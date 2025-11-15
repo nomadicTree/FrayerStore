@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+
+
+@dataclass(eq=False)
 class Subject:
-    def __init__(self, subject_id: int, name: str):
-        self.subject_id = subject_id
-        self.name = name
+    subject_id: int
+    name: str
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Subject):

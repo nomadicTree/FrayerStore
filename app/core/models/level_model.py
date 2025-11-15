@@ -1,8 +1,11 @@
+from dataclasses import dataclass
+
+
+@dataclass(eq=False, order=False)
 class Level:
-    def __init__(self, level_id: int, name: str, description: str = None):
-        self.level_id = level_id
-        self.name = name
-        self.description = description
+    level_id: int
+    name: str
+    description: str
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Level):
