@@ -19,3 +19,11 @@ class Level:
         if not isinstance(other, Level):
             return NotImplemented
         return self.name < other.name
+
+    @property
+    def slug(self) -> str:
+        return self.name.lower()
+
+    @property
+    def label(self) -> str:
+        return self.name
