@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import streamlit as st
+import datetime
 
 # Resolve path to app/db/Words.db
 DB_PATH = os.path.join(
@@ -10,7 +11,7 @@ DB_PATH = os.path.join(
 )
 
 
-@st.cache_resource
+@st.cache_resource(ttl=datetime.timedelta(hours=1))
 def get_db() -> sqlite3.Connection:
     """Open a cached connection to the database
 
