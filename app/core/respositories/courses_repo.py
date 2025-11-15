@@ -1,13 +1,15 @@
+import streamlit as st
+import datetime
 from app.core.db import get_db
 from app.core.models.course_model import Course
 from app.core.models.level_model import Level
 from app.core.models.subject_model import Subject
 
 
+@st.cache_data(ttl=datetime.timedelta(hours=1))
 def get_courses() -> list[Course]:
     """Get all Courses with their Subject and Level objects."""
     db = get_db()
-
     q = """
         SELECT
             c.id AS course_id,

@@ -1,8 +1,11 @@
+import streamlit as st
+import datetime
 from app.core.db import get_db
 from app.core.models.topic_model import Topic
 from app.core.models.course_model import Course
 
 
+@st.cache_data(ttl=datetime.timedelta(hours=1))
 def get_topics_for_course(course: Course, only_with_words: bool = False) -> list[Topic]:
     """Return all topics for a given course.
 

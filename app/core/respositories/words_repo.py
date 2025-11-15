@@ -2,6 +2,8 @@ from collections import defaultdict
 from typing import Any, Iterable
 
 from app.core.db import get_db
+import datetime
+import streamlit as st
 
 from app.core.models.course_model import Course
 from app.core.models.topic_model import Topic
@@ -245,6 +247,7 @@ def get_word_text(word_id: int) -> str:
     return word_row["word"]
 
 
+@st.cache_data(ttl=datetime.timedelta(hours=1), max_entries=100)
 def get_word_full(word_id: int) -> Word:
     subject = get_word_subject(word_id)
     if not subject:
@@ -292,6 +295,7 @@ def get_word_version_by_id(wv_id: int) -> WordVersion | None:
     return _build_word_version(row, levels, topics)
 
 
+@st.cache_data(ttl=datetime.timedelta(hours=1), max_entries=100)
 def get_word_versions_for_topic(topic: Topic) -> list[WordVersion]:
     db = get_db()
 
