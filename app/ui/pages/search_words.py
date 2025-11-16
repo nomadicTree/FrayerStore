@@ -76,13 +76,15 @@ def display_search_hit(hit: SearchHit, query: str):
         searchhit_details_button(hit)
 
 
-def display_search_results(results: list[SearchHit], query: str, elapsed: float):
+def display_search_results(
+    results: list[SearchHit], query: str, elapsed: float, filters: SearchFilters
+):
     if not query:
         return
 
     plural = "s" if len(results) != 1 else ""
     st.caption(
-        f"Found {len(results)} result{plural} for {query!r} in {format_time_text(elapsed)}."
+        f"Found {len(results)} result{plural} for {query!r} in {format_time_text(elapsed)} | filters: {filters.subject.name}, {filters.level.name}"
     )
 
     if not results:
@@ -93,20 +95,37 @@ def display_search_results(results: list[SearchHit], query: str, elapsed: float)
         display_search_hit(hit, query)
 
 
+def check_filter_session_state(filters: SearchFilters):
+    st.session_state.filter_subject = filters.subject.pk if filters.subject else None
+    st.session_state.filter_level = filters.level.name if filters.level else None
+
+    subject_changed = (
+        st.session_state.get("last_filter_subject") != st.session_state.filter_subject
+    )
+    level_changed = (
+        st.session_state.get("last_filter_level") != st.session_state.filter_level
+    )
+
+    st.session_state.last_filter_subject = st.session_state.filter_subject
+    st.session_state.last_filter_level = st.session_state.filter_level
+
+    return subject_changed, level_changed
+
+
 def main():
-    """Page contents including search bar and search results"""
     page_header()
 
-    # Initialize session state for search
-    if "search_query" not in st.session_state:
-        st.session_state.search_query = ""
-    if "search_results" not in st.session_state:
-        st.session_state.search_results = []
-    if "elapsed_time" not in st.session_state:
-        st.session_state.elapsed_time = None
+    # Initialise search state
+    st.session_state.setdefault("search_query", "")
+    st.session_state.setdefault("search_results", [])
+    st.session_state.setdefault("search_time_taken", None)
 
+    # Sidebar: get filters
     with st.sidebar:
         filters = select_search_filters()
+
+    # Detect filter changes
+    subject_changed, level_changed = check_filter_session_state(filters)
 
     # Search input
     query = st.text_input(
@@ -117,21 +136,34 @@ def main():
 
     st.divider()
 
+    # If filters changed and query is empty → clear results
+    if (subject_changed or level_changed) and not query:
+        st.session_state.search_results = []
+        st.session_state.search_time_taken = None
+
+    # Searching
     with st.spinner("Searching..."):
-        # Perform search only if the query changed
-        if query and query != st.session_state.search_query:
-            st.session_state.search_query = query
-            if query:
+        if query:
+            needs_search = (
+                query != st.session_state.search_query
+                or subject_changed
+                or level_changed
+            )
+
+            if needs_search:
+                st.session_state.search_query = query
+
                 (
                     st.session_state.search_results,
-                    st.session_state.elapsed_time,
+                    st.session_state.search_time_taken,
                 ) = search_query(query, filters)
 
-        # Display results
+    # UI
     display_search_results(
         st.session_state.search_results,
         st.session_state["search_query"],
-        st.session_state.elapsed_time,
+        st.session_state.search_time_taken,
+        filters,
     )
 
 
