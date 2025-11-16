@@ -4,8 +4,7 @@ from app.ui.components.selection_helpers import select_course
 from app.core.respositories.courses_repo import get_courses
 from app.core.respositories.topics_repo import get_topics_for_course
 from app.core.respositories.words_repo import get_word_versions_for_topic
-from app.ui.components.frayer import render_frayer_model
-from app.ui.components.buttons import wordversion_details_button
+from app.ui.components.frayer import wordversion_expander
 
 PAGE_TITLE = "Topic Glossary"
 
@@ -21,9 +20,7 @@ def main():
         topic_word_versions = get_word_versions_for_topic(topic)
         topic_word_versions.sort()
         for wv in topic_word_versions:
-            with st.expander(wv.word, expanded=False):
-                render_frayer_model(wv)
-                wordversion_details_button(wv, key_prefix=i)
+            wordversion_expander(wv, i)
 
 
 if __name__ == "__main__":

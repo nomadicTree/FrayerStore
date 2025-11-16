@@ -2,6 +2,13 @@ import streamlit as st
 import pandas as pd
 
 from app.core.models.word_models import WordVersion, RelatedWord, Word
+from app.ui.buttons import wordversion_details_button
+
+
+def wordversion_expander(wv: WordVersion, key: int = None) -> None:
+    with st.expander(wv.word, expanded=False):
+        render_frayer_model(wv)
+        wordversion_details_button(wv)
 
 
 def render_related_words(related_words: list[RelatedWord], word_id: int):
