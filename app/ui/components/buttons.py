@@ -1,5 +1,6 @@
 import streamlit as st
-from app.core.models.word_models import Word, WordVersion, RelatedWord
+from app.core.models.word_models import Word, WordVersion
+from app.services.search.search_models import SearchHit
 
 VIEW_PAGE = "ui/pages/view.py"
 
@@ -18,4 +19,12 @@ def wordversion_details_button(wv: WordVersion, key_prefix: str = "") -> None:
         st.session_state["view_subject"] = wv.subject_slug
         st.session_state["view_word"] = wv.word_slug
         st.session_state["view_levels"] = wv.level_set_slug
+        st.switch_page(VIEW_PAGE)
+
+
+def searchhit_details_button(hit: SearchHit) -> None:
+    if st.button(label="View full details", key=hit.word_id):
+        st.session_state["view_subject"] = hit.subject_slug
+        st.session_state["view_word"] = hit.word_slug
+        st.session_state["view_levels"] = hit.level_set_slug
         st.switch_page(VIEW_PAGE)
