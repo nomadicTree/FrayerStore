@@ -195,7 +195,9 @@ def render_sidebar(word, levels_slug):
         st.session_state["view_levels"] = version.level_set_slug
         sync_view_to_global_if_valid()
 
-        st.write("Toggle visibility:")
+        st.divider()
+
+        st.write("Visibility:")
         options = {
             "show_word": st.checkbox("Word", True),
             "show_definition": st.checkbox("Definition", True),
