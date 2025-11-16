@@ -2,7 +2,7 @@ from app.core.db import get_db
 from app.core.models.subject_model import Subject
 
 
-def get_subjects():
+def get_all_subjects():
     """Get all Subjects
 
     Returns:
