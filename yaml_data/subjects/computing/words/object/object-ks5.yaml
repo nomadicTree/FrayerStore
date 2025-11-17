@@ -29,7 +29,7 @@ non_examples:
 - 'Instance: ''instance'' describes the relationship of an object to its class; every
   object is an instance, but ''instance'' refers to the relationship, not the actual
   thing in memory'
-- 'Class: a blueprint from which objects are created'
+- 'Class: a template from which objects are created'
 topics:
 - course: OCR H446
   codes:

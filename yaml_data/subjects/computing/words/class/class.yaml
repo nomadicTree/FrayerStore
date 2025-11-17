@@ -1,6 +1,6 @@
 word: class
 levels: [KS5]
-definition: A reusable blueprint to organise data (attributes) and behaviour (methods).
+definition: A reusable template to organise data (attributes) and behaviour (methods).
 characteristics:
 - Used in object-oriented programming
 - Can be used to create objects (i.e., instances of a class)
