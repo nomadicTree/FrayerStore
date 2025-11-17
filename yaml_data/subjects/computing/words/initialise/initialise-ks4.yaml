@@ -6,10 +6,7 @@ characteristics:
 - In languages like C, C++, and Java, initialisation may happen after declaration (`int x; x = 5;`) or at the point of declaration (`int x = 5;`)
 examples:
 - |-
-  Initialising a variable (Python):
-  ```python
-  x = 5
-  ```
+  Initialising a variable (Python): `x = 5`
 - |-
   Initialising a variable after declaration (C):
   ```c
@@ -17,10 +14,7 @@ examples:
   x = 5; // initialisation
   ```
 - |-
-  Initialising a variable at the point of declaration (C):
-  ```c
-  int x = 5;
-  ```
+  Initialising a variable at the point of declaration (C): `int x = 5;`
 non_examples:
 - 'Declaring a variable (C): `int x;`'
 - 'Declaring a variable (JavaScript): `let x;`'
