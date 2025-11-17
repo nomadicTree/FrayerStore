@@ -4,7 +4,7 @@ import yaml
 from app.ui.components.selection_helpers import select_courses
 from app.ui.components.page_header import page_header
 from app.ui.components.frayer import render_frayer_model
-from app.core.utils.strings import safe_snake_case_filename
+from app.core.utils.strings import build_wordversion_filename
 from app.core.respositories.courses_repo import get_courses
 from app.core.respositories.topics_repo import get_topics_for_course
 from app.core.models.topic_model import Topic
@@ -147,7 +147,7 @@ def main():
             st.download_button(
                 "Download YAML",
                 word_yaml,
-                file_name=safe_snake_case_filename(word_data["word"], "yaml"),
+                file_name=build_wordversion_filename(word_data["word"], yaml_levels),
             )
 
     preview_word = WordVersion(

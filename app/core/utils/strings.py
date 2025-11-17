@@ -2,7 +2,7 @@ import unicodedata
 import re
 
 
-def safe_snake_case_filename(s: str = "word", extension: str = "txt") -> str:
+def safe_snake_case_filename(s: str = "word") -> str:
     # Normalize unicode characters to ASCII equivalents
     if len(s) == 0:
         s = "word"
@@ -24,7 +24,7 @@ def safe_snake_case_filename(s: str = "word", extension: str = "txt") -> str:
     s = re.sub(r"_+", "_", s)
 
     # Strip leading/trailing underscores
-    return f"{s.strip('_')}.{extension}"
+    return f"{s.strip('_')}"
 
 
 def format_time_text(elapsed_time: float) -> str:
@@ -48,3 +48,24 @@ def normalise_synonym(s: str) -> str:
         return s
     # Otherwise use lowercase.
     return s.lower()
+
+
+def build_wordversion_filename(word: str, levels: list[str]) -> str:
+    """
+    Generate a filename of the form:
+        central_processing_unit-ks4-ks5.yaml
+    Levels MUST be:
+    - lowercase
+    - sorted
+    - hyphen-joined
+    """
+    snake = safe_snake_case_filename(word)  # get the snake_case base name
+
+    levels_clean = [lvl.lower() for lvl in levels]
+    levels_clean.sort()
+
+    if levels_clean:
+        suffix = "-".join(levels_clean)
+        return f"{snake}-{suffix}.yaml"
+    else:
+        return f"{snake}.yaml"
