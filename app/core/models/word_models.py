@@ -126,6 +126,11 @@ class WordVersionChoice:
     def label(self) -> str:
         return self.version.level_label
 
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, WordVersionChoice):
+            return NotImplemented
+        return self.label < other.label
+
 
 @dataclass(eq=False, order=False)
 class Word:
