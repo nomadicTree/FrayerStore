@@ -1,4 +1,4 @@
-word: Variable
+word: variable
 levels: [KS4, KS5]
 definition: >
   A named location in memory whose value can change while the program is running.

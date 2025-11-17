@@ -1,4 +1,4 @@
-word: Register
+word: register
 levels: [KS4,KS5]
 definition: >
   Small, fast storage location within the CPU.

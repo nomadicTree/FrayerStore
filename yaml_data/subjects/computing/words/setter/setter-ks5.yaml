@@ -1,4 +1,4 @@
-word: Setter
+word: setter
 definition: A method that changes the value of an object's attribute.
 characteristics:
 - Provides controlled write access to an attribute without exposing the attribute directly

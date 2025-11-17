@@ -1,4 +1,4 @@
-word: Method
+word: method
 levels: [KS5]
 definition: A subprogram defined within a class that operates on the data of an object and defines the class's behaviour.
 characteristics:

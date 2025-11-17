@@ -1,4 +1,4 @@
-word: Getter
+word: getter
 definition: A method that returns the value of an object's attribute.
 characteristics:
 - Provides read-only access to an attribute without exposing the attribute directly

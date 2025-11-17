@@ -1,7 +1,7 @@
-word: CPU
+word: Central Processing Unit
 levels: [KS5]
 definition: >
-  Central Processing Unit, the brain of the computer.
+  The brain of the computer.
 characteristics:
   - Performs the Fetch-Decode-Execute (FDE) cycle
   - Receives data from input and memory
