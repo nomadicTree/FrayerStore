@@ -157,7 +157,7 @@ def choose_version_for_word(word, levels_slug):
       - sync view -> global
     Returns the chosen WordVersion.
     """
-    choices = [WordVersionChoice(v) for v in word.versions]
+    choices = sorted([WordVersionChoice(v) for v in word.versions])
 
     # 1. initial view_level (from URL/global/first)
     init_view_levels(choices, levels_slug)
