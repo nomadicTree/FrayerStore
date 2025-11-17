@@ -32,8 +32,6 @@
 - Sequence
 - Selection
 - Iteration
-- Getter
-- Setter
 - Operator
 - Logical operator
 - Arithmetic operator
@@ -52,8 +50,6 @@
 - Subprogram
 - Function
 - Procedure
-- Declare
-- Initialise
 - Primitive data type
 - Data structure
 - List
