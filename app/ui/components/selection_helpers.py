@@ -48,7 +48,6 @@ def select_one(
             st.session_state[session_key],
             key=f"{cookie_key}_set_init",
         )
-        st.rerun()
     selected_slug = st.session_state[session_key]
 
     # --- STEP 2: stale cleanup
@@ -127,7 +126,7 @@ def select_many(items, key, label, prefix="global"):
             ",".join(st.session_state[session_key]),
             key=f"{cookie_key}_set_init",
         )
-        st.rerun()
+
     # --- STEP 2: stale cleanup
     selected_slugs = [s for s in st.session_state[session_key] if s in slug_map]
     st.session_state[session_key] = selected_slugs
