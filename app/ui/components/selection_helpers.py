@@ -1,7 +1,9 @@
 import streamlit as st
-
+from extra_streamlit_components import CookieManager
 from app.core.models.course_model import Course
 from app.core.models.subject_model import Subject
+
+cookie_manager = CookieManager()
 
 
 def _sync_global_qp(key, value):
@@ -15,34 +17,38 @@ def _sync_global_qp(key, value):
         st.query_params[key] = value
 
 
-def select_one(items, key, label, prefix="global", default_item=None):
+def select_one(
+    items: list,
+    key: str,
+    label: str,
+    prefix: str = "global",
+    default_item=None,
+):
     if not items:
         st.warning(f"No options for '{label}'.")
         return None
 
     slug_map = {item.slug: item for item in items}
     session_key = f"{prefix}_{key}"
+    cookie_key = f"fs_{prefix}_{key}"
 
-    # --- STEP 1: initialisation from qp (global only)
+    # --- STEP 1: initialise from COOKIE (first load only)
     if session_key not in st.session_state:
-        if prefix == "global":
-            qp = st.query_params.get(key)
-            qp_slug = qp[0] if isinstance(qp, list) else qp
+        saved = cookie_manager.get(cookie_key)
 
-            # qp wins if valid
-            if qp_slug in slug_map:
-                st.session_state[session_key] = qp_slug
-            # otherwise fallback
-            elif default_item:
-                st.session_state[session_key] = default_item.slug
-            else:
-                st.session_state[session_key] = items[0].slug
+        if saved in slug_map:
+            st.session_state[session_key] = saved
+        elif default_item:
+            st.session_state[session_key] = default_item.slug
         else:
-            # prefix="view": ignore qp entirely
-            if default_item:
-                st.session_state[session_key] = default_item.slug
-            else:
-                st.session_state[session_key] = items[0].slug
+            st.session_state[session_key] = items[0].slug
+
+        # Write cookie on first load
+        cookie_manager.set(
+            cookie_key,
+            st.session_state[session_key],
+            key=f"{cookie_key}_set_init",
+        )
 
     selected_slug = st.session_state[session_key]
 
@@ -50,6 +56,12 @@ def select_one(items, key, label, prefix="global", default_item=None):
     if selected_slug not in slug_map:
         selected_slug = default_item.slug if default_item else items[0].slug
         st.session_state[session_key] = selected_slug
+
+        cookie_manager.set(
+            cookie_key,
+            selected_slug,
+            key=f"{cookie_key}_set_stale",
+        )
 
     selected_obj = slug_map[selected_slug]
 
@@ -62,8 +74,17 @@ def select_one(items, key, label, prefix="global", default_item=None):
         key=f"{prefix}_{key}_widget",
     )
 
-    # update session state
-    st.session_state[session_key] = selected_from_widget.slug
+    new_slug = selected_from_widget.slug
+
+    # --- STEP 4: widget → session → cookie
+    if new_slug != selected_slug:
+        st.session_state[session_key] = new_slug
+
+        cookie_manager.set(
+            cookie_key,
+            new_slug,
+            key=f"{cookie_key}_set_widget",
+        )
 
     return selected_from_widget
 
@@ -82,51 +103,45 @@ def select_course(available_courses: list[Course]):
     return course
 
 
-def select_many(
-    items: list,
-    key: str,
-    label: str,
-    prefix: str = "global",
-):
-    """
-    Multi-select selector for Model Maker.
-    - prefix="global": URL only initialises on first load; session dominates.
-    - Stores slugs, not PKs.
-    """
-
+def select_many(items, key, label, prefix="global"):
     if not items:
         return []
 
     slug_map = {item.slug: item for item in items}
     session_key = f"{prefix}_{key}"
+    cookie_key = f"fs_{prefix}_{key}"
 
-    # GLOBAL selectors may use query params only on 1st load
-    query_value = st.query_params.get(key) if prefix == "global" else None
+    # --- STEP 1: initialise from COOKIE (first load only)
+    if session_key not in st.session_state:
+        saved_csv = cookie_manager.get(cookie_key)
 
-    # Parse ?levels=a,b,c → ["a", "b", "c"]
-    if isinstance(query_value, list):
-        query_slugs = query_value
-    elif isinstance(query_value, str):
-        query_slugs = [x.strip() for x in query_value.split(",") if x.strip()]
-    else:
-        query_slugs = []
+        if saved_csv:
+            saved_slugs = [s.strip() for s in saved_csv.split(",") if s.strip()]
+            valid = [s for s in saved_slugs if s in slug_map]
+            st.session_state[session_key] = valid
+        else:
+            st.session_state[session_key] = []
 
-    # 1. INITIALISE session state
-    original_slugs = st.session_state.get(session_key)
-    if original_slugs is None:
-        # only on first load
-        valid_slugs = [s for s in query_slugs if s in slug_map]
-        st.session_state[session_key] = valid_slugs
-        original_slugs = valid_slugs
+        # Write cookie on first load
+        cookie_manager.set(
+            cookie_key,
+            ",".join(st.session_state[session_key]),
+            key=f"{cookie_key}_set_init",
+        )
 
-    # 2. Remove stale slugs
-    cleaned_slugs = [s for s in original_slugs if s in slug_map]
-    st.session_state[session_key] = cleaned_slugs
-    selected_slugs = cleaned_slugs
+    # --- STEP 2: stale cleanup
+    selected_slugs = [s for s in st.session_state[session_key] if s in slug_map]
+    st.session_state[session_key] = selected_slugs
+
+    cookie_manager.set(
+        cookie_key,
+        ",".join(selected_slugs),
+        key=f"{cookie_key}_set_stale",
+    )
 
     selected_objs = [slug_map[s] for s in selected_slugs]
 
-    # 3. Render widget (session-state drives selection)
+    # --- STEP 3: widget
     selected_from_widget = st.multiselect(
         label,
         items,
@@ -135,10 +150,16 @@ def select_many(
         key=f"{prefix}_{key}_widget",
     )
 
-    # 4. Widget → session (NO query-param sync)
+    # --- STEP 4: widget → session → cookie
     new_slugs = [i.slug for i in selected_from_widget]
     if set(new_slugs) != set(selected_slugs):
         st.session_state[session_key] = new_slugs
+
+        cookie_manager.set(
+            cookie_key,
+            ",".join(new_slugs),
+            key=f"{cookie_key}_set_widget",
+        )
 
     return selected_from_widget
 
