@@ -166,7 +166,6 @@ def main():
         render_frayer_model(
             preview_word,
             show_topics=False,
-            show_related_words=False,
         )
 
 
