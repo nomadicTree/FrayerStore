@@ -1,9 +1,14 @@
 import sqlite3
-from frayerstore.paths import DB_PATH
+from src.frayerstore.paths import DB_PATH
+from pathlib import Path
+
+
+def open_db_at(path: Path) -> sqlite3.Connection:
+    """Open a new connection to a database at given path"""
+    conn = sqlite3.connect(path, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def get_db_uncached() -> sqlite3.Connection:
-    """Open a new connection to the database"""
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    return conn
+    return open_db_at(DB_PATH)
