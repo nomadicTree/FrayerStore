@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent()  # app/
 DB_PATH = BASE_DIR / "data" / "frayerstore.db"
 
 
-def get_db() -> sqlite3.Connection:
+def get_db_uncached() -> sqlite3.Connection:
     """Open a connection to the database
 
     Returns:
