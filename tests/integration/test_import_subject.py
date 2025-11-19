@@ -19,9 +19,15 @@ def test_import_single_subject(schema_db, subjects_path):
     assert count == 1
 
 
-def test_import_multiple_subjects(schema_db, subjects_path):
-    import_subject(schema_db, subjects_path / "computing.yaml")
-    import_subject(schema_db, subjects_path / "maths.yaml")
+def test_import_multiple_subjects(schema_db, tmp_path):
+    a = tmp_path / "a.yaml"
+    b = tmp_path / "b.yaml"
+
+    a.write_text("name: Computing")
+    b.write_text("name: Maths")
+
+    import_subject(schema_db, a)
+    import_subject(schema_db, b)
 
     rows = schema_db.execute("SELECT * FROM Subjects").fetchall()
     assert len(rows) == 2
@@ -29,14 +35,16 @@ def test_import_multiple_subjects(schema_db, subjects_path):
     assert names == {"Computing", "Maths"}
 
 
-def test_subject_name_collision(schema_db, subjects_path, tmp_path):
-    import_subject(schema_db, subjects_path / "computing.yaml")
+def test_subject_name_collision(schema_db, tmp_path):
+    a = tmp_path / "a.yaml"
+    b = tmp_path / "b.yaml"
 
-    duplicate_subject = tmp_path / "computing_duplicate.yaml"
-    duplicate_subject.write_text("name: Computing")
+    a.write_text("name: Computing")
+    b.write_text("name: Computing")
 
+    import_subject(schema_db, a)
     with pytest.raises(SubjectImportCollision):
-        import_subject(schema_db, duplicate_subject)
+        import_subject(schema_db, b)
 
 
 def test_subject_slug_is_derived(schema_db, tmp_path):
