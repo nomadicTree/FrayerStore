@@ -3,7 +3,7 @@
 import streamlit as st
 from pathlib import Path
 
-PAGES_DIR = Path("app" / "ui" / "pages")
+PAGES_DIR = Path("ui" / "pages")
 
 pages = {
     "FrayerStore": [

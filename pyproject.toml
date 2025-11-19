@@ -1,0 +1,4 @@
+[project]
+name = "frayerstore"
+version = "0.1"
+dependencies = ["streamlit", "pyyaml"]
