@@ -1,0 +1,4 @@
+[cache]
+db_connection_ttl = None
+frequent_query_ttl = "12h"
+search_ttl = "12h"
