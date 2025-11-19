@@ -1,9 +1,5 @@
 import sqlite3
-from pathlib import Path
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]  # frayerstore/
-DB_PATH = PROJECT_ROOT / "data" / "frayerstore.db"
+from frayerstore.paths import DB_PATH
 
 
 def get_db_uncached() -> sqlite3.Connection:

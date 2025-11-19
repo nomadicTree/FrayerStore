@@ -4,8 +4,7 @@ from pathlib import Path
 import tomllib
 import pandas as pd
 
-BASE_DIR = Path(__file__).resolve().parent
-CONFIG_PATH = BASE_DIR.parent / "config" / "settings.toml"
+from frayerstore.paths import CONFIG_PATH
 
 
 def parse_ttl(value: str | int | None) -> int | None:
