@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from abc import ABC, abstractmethod
 import sqlite3
-from frayerstore.core.utils import slugify
+from frayerstore.core.utils.slugify import slugify
 from .exceptions import InvalidYamlStructure
 
 
@@ -35,11 +35,11 @@ class ImportItem(ABC):
 class ImportSubject(ImportItem):
     @classmethod
     def from_yaml(cls, data: dict) -> ImportSubject:
-        if "name" not in data or not data["name"].strip():
+        if "subject" not in data or not data["subject"].strip():
             raise InvalidYamlStructure(
-                "Subject definition missing required field 'name'."
+                "Subject definition missing required field 'subject'."
             )
-        name = data["name"].strip()
+        name = data["subject"].strip()
         slug = slugify(name)
         return cls(id=None, name=name, slug=slug)
 
