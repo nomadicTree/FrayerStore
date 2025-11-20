@@ -37,7 +37,6 @@ def test_import_multiple_subjects(schema_db, tmp_path):
     assert names == {"Computing", "Maths"}
 
 
-# This is not actually expected behaviour, it should just skip rather than raise exception
 def test_subject_name_collision(schema_db, tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
@@ -46,6 +45,7 @@ def test_subject_name_collision(schema_db, tmp_path):
     a.write_text("subject: Computing")
     b.write_text("subject: Computing")
 
+    import_subject(schema_db, a, report)
     import_subject(schema_db, b, report)
     rows = schema_db.execute("SELECT * FROM Subjects").fetchall()
     assert len(rows) == 1
@@ -83,7 +83,6 @@ def test_slug_derivation_rules(schema_db, tmp_path, name, expected_slug):
     assert slug == expected_slug
 
 
-# Again, this test is not accurate: duplicate slugs should be skipped rather than raise exceptions
 def test_slug_collision(schema_db, tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
@@ -92,5 +91,6 @@ def test_slug_collision(schema_db, tmp_path):
     a.write_text("subject: Class")
     b.write_text("subject: class")
 
+    import_subject(schema_db, a, report)
     with pytest.raises(SubjectImportCollision):
         import_subject(schema_db, b, report)
