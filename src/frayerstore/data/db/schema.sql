@@ -30,7 +30,7 @@ CREATE TABLE Topics (
 
 CREATE TABLE Words (
     id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
+    name TEXT NOT NULL,
     subject_id INTEGER NOT NULL REFERENCES Subjects(id),
     slug TEXT NOT NULL,
     UNIQUE(word, subject_id),
@@ -81,7 +81,7 @@ CREATE TABLE WordRelationships (
 CREATE VIEW vw_WordDetails AS
 SELECT DISTINCT
     w.id          AS word_id,
-    w.word        AS word,
+    w.name        AS name,
     w.slug        AS word_slug,
 
     s.id          AS subject_id,
@@ -115,7 +115,7 @@ LEFT JOIN Courses c ON t.course_id = c.id;
 CREATE VIEW vw_SearchWordVersions AS
 SELECT
     w.id AS word_id,
-    w.word AS word,
+    w.name AS name,
     w.slug AS word_slug,
 
     sub.id AS subject_id,
@@ -125,8 +125,8 @@ SELECT
     -- synonyms (comma-separated, distinct)
     GROUP_CONCAT(DISTINCT syn.synonym) AS synonyms,
 
-    -- searchable text: word + synonyms (spaces)
-    w.word || ' ' ||
+    -- searchable text: name + synonyms (spaces)
+    w.name || ' ' ||
     COALESCE(REPLACE(GROUP_CONCAT(DISTINCT syn.synonym), ',', ' '), '')
     AS search_text,
 
