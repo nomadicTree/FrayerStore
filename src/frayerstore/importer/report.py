@@ -37,7 +37,13 @@ class ImportStageReport:
 
 @dataclass
 class ImportReport:
-    subjects: ImportStageReport
-    courses: ImportStageReport
-    topics: ImportStageReport
-    words: ImportStageReport
+    subjects: ImportStageReport = field(
+        default_factory=lambda: ImportStageReport("Subjects")
+    )
+    courses: ImportStageReport = field(
+        default_factory=lambda: ImportStageReport("Courses")
+    )
+    topics: ImportStageReport = field(
+        default_factory=lambda: ImportStageReport("Topics")
+    )
+    words: ImportStageReport = field(default_factory=lambda: ImportStageReport("Words"))
