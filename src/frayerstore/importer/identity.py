@@ -25,7 +25,6 @@ def resolve_identity(
     incoming: ImportItem,
     existing_by_slug: ImportItem | None,
     existing_by_name: ImportItem | None,
-    stage_report: ImportStageReport,
 ) -> IdentityResolutionResult:
     # DOUBLE-COLLLISION (slug row != name row)
     if (
@@ -38,7 +37,6 @@ def resolve_identity(
             f"'{existing_by_slug.name}' (id={existing_by_slug.id}) but name '{incoming.name}' "
             f"refers to '{existing_by_name.name}' (id={existing_by_name.id})."
         )
-        stage_report.record_error(message)
         return IdentityResolutionResult(decision=ImportDecision.ERROR, error=message)
 
     # SLUG MATCH: skip or fatal mismatch
@@ -49,13 +47,11 @@ def resolve_identity(
                 f"do not match: incoming '{incoming.name}' vs "
                 f"existing '{existing_by_slug.name}'."
             )
-            stage_report.record_error(message)
             return IdentityResolutionResult(
                 decision=ImportDecision.ERROR, error=message
             )
 
         # Idempotent skip
-        stage_report.record_skipped(existing_by_slug)
         return IdentityResolutionResult(
             decision=ImportDecision.SKIP, existing=existing_by_slug
         )
@@ -68,20 +64,29 @@ def resolve_identity(
                 f"do not match: incoming '{incoming.slug}' vs "
                 f"existing '{existing_by_name.slug}'."
             )
-            stage_report.record_error(message)
             return IdentityResolutionResult(
                 decision=ImportDecision.ERROR, error=message
             )
+        # Idempotent skip
+        return IdentityResolutionResult(
+            decision=ImportDecision.SKIP, existing=existing_by_name
+        )
 
     # NEITHER EXISTS: PROCEED TO CREATE
     return IdentityResolutionResult(decision=ImportDecision.CREATE)
 
 
-def handle_resolution(resolution, exception_type) -> ImportItem | None:
-    if resolution.decision is ImportDecision.ERROR:
+def handle_resolution(
+    resolution: IdentityResolutionResult,
+    exception_type: type[ImporterError],
+    stage_report: ImportStageReport,
+) -> ImportItem | None:
+    if resolution.decision == ImportDecision.ERROR:
+        stage_report.record_error(resolution.error)
         raise exception_type(resolution.error)
 
-    if resolution.decision is ImportDecision.SKIP:
+    if resolution.decision == ImportDecision.SKIP:
+        stage_report.record_skipped(resolution.existing)
         return resolution.existing
 
     return None
@@ -94,13 +99,15 @@ def import_with_identity(
     existing_by_slug: ImportItem | None,
     existing_by_name: ImportItem | None,
     stage_report: ImportStageReport,
-    error_type: ImporterError,
+    exception_type: type[ImporterError],
 ):
     resolution = resolve_identity(
-        incoming, existing_by_slug, existing_by_name, stage_report
+        incoming,
+        existing_by_slug,
+        existing_by_name,
     )
 
-    existing = handle_resolution(resolution, error_type)
+    existing = handle_resolution(resolution, exception_type, stage_report)
 
     if existing:
         return existing
