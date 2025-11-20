@@ -1,11 +1,11 @@
 import sqlite3
 from pathlib import Path
 from .yaml_utils import load_yaml
-from .exceptions import SubjectImportError
+from .exceptions import SubjectImportError, SubjectImportCollision
 from .db_utils import get_subject_by_name, get_subject_by_slug
 from .models import ImportSubject
 from .report import ImportReport
-from .utils.identity import import_with_identity
+from .identity import import_with_identity
 
 
 def import_subject(
@@ -28,5 +28,5 @@ def import_subject(
         existing_by_slug=existing_by_slug,
         existing_by_name=existing_by_name,
         stage_report=report.subjects,
-        error_type=SubjectImportError,
+        error_type=SubjectImportCollision,
     )
