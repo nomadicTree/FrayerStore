@@ -42,4 +42,8 @@ def slugify(s: str) -> str:
     s = _to_ascii(s)
     s = s.lower().strip()
     s = re.sub(r"[^a-z0-9]+", "-", s)
-    return s.strip("-")
+    s = s.strip("-")
+    if s:
+        return s
+    else:
+        raise ValueError("Derived an empty string")

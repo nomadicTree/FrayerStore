@@ -62,3 +62,9 @@ def test_slugify_empty_or_whitespace(bad):
 def test_slugify_non_str(bad):
     with pytest.raises(TypeError):
         slugify(bad)
+
+
+def test_slugify_noalphanumerics():
+    bad = "!!!!!***&&@@@???!"
+    with pytest.raises(ValueError):
+        slugify(bad)
