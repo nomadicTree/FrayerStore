@@ -1,14 +1,15 @@
 import pytest
 from frayerstore.importer.import_subjects import import_subject
 from frayerstore.importer.exceptions import (
-    SubjectImportError,
     SubjectImportCollision,
 )
+from frayerstore.importer.report import ImportReport
 
 
 def test_import_single_subject(schema_db, subjects_path):
     subject_yaml = subjects_path / "computing.yaml"
-    import_subject(schema_db, subject_yaml)
+    report = ImportReport()
+    import_subject(schema_db, subject_yaml, report)
     row = schema_db.execute(
         "SELECT * FROM Subjects WHERE name = 'Computing';"
     ).fetchone()
@@ -22,12 +23,13 @@ def test_import_single_subject(schema_db, subjects_path):
 def test_import_multiple_subjects(schema_db, tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
+    report = ImportReport()
 
-    a.write_text("name: Computing")
-    b.write_text("name: Maths")
+    a.write_text("subject: Computing")
+    b.write_text("subject: Maths")
 
-    import_subject(schema_db, a)
-    import_subject(schema_db, b)
+    import_subject(schema_db, a, report)
+    import_subject(schema_db, b, report)
 
     rows = schema_db.execute("SELECT * FROM Subjects").fetchall()
     assert len(rows) == 2
@@ -35,23 +37,27 @@ def test_import_multiple_subjects(schema_db, tmp_path):
     assert names == {"Computing", "Maths"}
 
 
+# This is not actually expected behaviour, it should just skip rather than raise exception
 def test_subject_name_collision(schema_db, tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
+    report = ImportReport()
 
-    a.write_text("name: Computing")
-    b.write_text("name: Computing")
+    a.write_text("subject: Computing")
+    b.write_text("subject: Computing")
 
-    import_subject(schema_db, a)
-    with pytest.raises(SubjectImportCollision):
-        import_subject(schema_db, b)
+    import_subject(schema_db, b, report)
+    rows = schema_db.execute("SELECT * FROM Subjects").fetchall()
+    assert len(rows) == 1
+    assert len(report.subjects.skipped) == 1
 
 
 def test_subject_slug_is_derived(schema_db, tmp_path):
     yaml = tmp_path / "sub.yaml"
-    yaml.write_text("name: Computer Science")
+    report = ImportReport()
+    yaml.write_text("subject: Computer Science")
 
-    import_subject(schema_db, yaml)
+    import_subject(schema_db, yaml, report)
 
     row = schema_db.execute("SELECT slug FROM Subjects").fetchone()
     assert row["slug"] == "computer-science"
@@ -69,21 +75,22 @@ def test_subject_slug_is_derived(schema_db, tmp_path):
 )
 def test_slug_derivation_rules(schema_db, tmp_path, name, expected_slug):
     file = tmp_path / "sub.yaml"
-    file.write_text(f"name: {name}")
+    report = ImportReport()
+    file.write_text(f"subject: {name}")
 
-    import_subject(schema_db, file)
+    import_subject(schema_db, file, report)
     slug = schema_db.execute("SELECT slug FROM Subjects").fetchone()["slug"]
     assert slug == expected_slug
 
 
+# Again, this test is not accurate: duplicate slugs should be skipped rather than raise exceptions
 def test_slug_collision(schema_db, tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
+    report = ImportReport()
 
-    a.write_text("name: Class")
-    b.write_text("name: class")
-
-    import_subject(schema_db, a)
+    a.write_text("subject: Class")
+    b.write_text("subject: class")
 
     with pytest.raises(SubjectImportCollision):
-        import_subject(schema_db, b)
+        import_subject(schema_db, b, report)
