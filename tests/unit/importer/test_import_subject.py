@@ -1,6 +1,6 @@
 import pytest
-from frayerstore.importer.models import ImportSubject
 from frayerstore.importer.exceptions import InvalidYamlStructure
+from frayerstore.importer.subjects import ImportSubject
 
 
 def test_from_yaml_valid():

@@ -2,7 +2,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 from dataclasses import dataclass
-from frayerstore.core.utils import slugify
+
+from frayerstore.core.utils.slugify import slugify
 from .yaml_utils import load_yaml
 from .exceptions import SubjectImportCollision, InvalidYamlStructure
 from .db import get_subject_by_name, get_subject_by_slug

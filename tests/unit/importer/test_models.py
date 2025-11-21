@@ -1,4 +1,4 @@
-from frayerstore.importer.models import ImportSubject
+from frayerstore.importer.subjects import ImportSubject
 
 
 def test_import_item_with_id():
