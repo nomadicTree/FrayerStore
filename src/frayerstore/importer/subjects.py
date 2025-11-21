@@ -1,11 +1,34 @@
+from __future__ import annotations
 import sqlite3
 from pathlib import Path
+from dataclasses import dataclass
+from frayerstore.core.utils import slugify
 from .yaml_utils import load_yaml
-from .exceptions import SubjectImportError, SubjectImportCollision
+from .exceptions import SubjectImportCollision, InvalidYamlStructure
 from .db import get_subject_by_name, get_subject_by_slug
-from .models import ImportSubject
+from .models import ImportItem
 from .report import ImportReport
 from .identity import import_with_identity
+
+
+@dataclass(frozen=True)
+class ImportSubject(ImportItem):
+    @classmethod
+    def from_yaml(cls, data: dict) -> ImportSubject:
+        if "subject" not in data or not data["subject"].strip():
+            raise InvalidYamlStructure(
+                "Subject definition missing required field 'subject'."
+            )
+        name = data["subject"].strip()
+        slug = slugify(name)
+        return cls(id=None, name=name, slug=slug)
+
+    @classmethod
+    def create_in_db(cls, conn: sqlite3.Row, incoming: ImportSubject) -> ImportSubject:
+        from .db import insert_subject
+
+        new_id = insert_subject(conn, incoming)
+        return incoming.with_id(new_id)
 
 
 def import_subject(
