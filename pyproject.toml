@@ -2,3 +2,11 @@
 name = "frayerstore"
 version = "0.1"
 dependencies = ["streamlit", "pyyaml"]
+
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@abstractmethod",
+]
+
