@@ -1,6 +1,14 @@
-import pytest
 import sqlite3
 from pathlib import Path
+import sys
+
+import pytest
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = PROJECT_ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 from frayerstore.importer.report import ImportReport, ImportStageReport
 from frayerstore.importer.exceptions import SubjectImportCollision
 
