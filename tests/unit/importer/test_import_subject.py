@@ -1,13 +1,12 @@
 import pytest
-from frayerstore.importer.models import ImportSubject
+from frayerstore.importer.dto.import_subject import ImportSubject
 from frayerstore.importer.exceptions import InvalidYamlStructure
 
 
 def test_from_yaml_valid():
-    data = {"subject": "Computing"}
+    data = {"name": "Computing"}
     item = ImportSubject.from_yaml(data)
 
-    assert item.id is None
     assert item.name == "Computing"
     assert item.slug == "computing"
 
