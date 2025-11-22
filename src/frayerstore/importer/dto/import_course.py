@@ -2,36 +2,23 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from frayerstore.core.utils.slugify import slugify
-from frayerstore.importer.utils import missing_required_field_message
 from frayerstore.importer.exceptions import InvalidYamlStructure
 from frayerstore.importer.dto.import_item import ImportItem
 
 
 @dataclass(frozen=True)
 class ImportCourse(ImportItem):
-    name: str
-    subject_slug: str
-    level_slug: str
-    number: str
+    level_pk: int
 
     @classmethod
-    def from_yaml(cls, data: dict) -> ImportCourse:
-        required_fields = ["name", "subject", "level", "topics"]
+    def from_yaml(cls, data: dict, *, level_pk: int) -> ImportCourse:
+        if not isinstance(data, dict):
+            raise InvalidYamlStructure("Course must be a mapping")
 
-        for field in required_fields:
-            message = missing_required_field_message("Course", field)
-            value = data.get(field)
-            if value is None:
-                raise InvalidYamlStructure(message)
+        name = data.get("name")
+        if not name or not isinstance(name, str) or not name.strip():
+            raise InvalidYamlStructure("Course missing required field 'name'")
 
-            if not isinstance(value, str):
-                raise InvalidYamlStructure(message)
-
-            if not value.strip():
-                raise InvalidYamlStructure(message)
-
-        name = str(data["name"]).strip()
-        subject = str(data["subject"]).strip()
-        level = str(data["level"]).strip()
-
-        return cls(name=full_name, slug=slug, category=category, number=number)
+        name = name()
+        slug = slugify(name)
+        return cls(level_pk=level_pk, name=name, slug=slug)

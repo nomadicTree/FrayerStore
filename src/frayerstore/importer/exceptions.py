@@ -20,3 +20,11 @@ class SubjectImportError(ImporterError):
 
 class LevelImportError(ImporterError):
     pass
+
+
+class CourseImportError(ImporterError):
+    pass
+
+
+class TopicImportError(ImporterError):
+    pass

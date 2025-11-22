@@ -25,6 +25,7 @@ CREATE TABLE Topics (
     course_id INTEGER NOT NULL REFERENCES Courses(id),
     code TEXT NOT NULL,
     name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
     UNIQUE(course_id, code)
 );
 
