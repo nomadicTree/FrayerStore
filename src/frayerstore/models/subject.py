@@ -1,19 +1,11 @@
 from dataclasses import dataclass
+from .domain_entity import DomainEntity
 
 
-@dataclass(eq=False, frozen=True)
-class Subject:
-    pk: int
+@dataclass(frozen=True)
+class Subject(DomainEntity):
     name: str
     slug: str
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Subject):
-            return NotImplemented
-        return self.pk == other.pk
-
-    def __hash__(self) -> int:
-        return hash(self.pk)
 
     @property
     def label(self):

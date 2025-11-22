@@ -5,6 +5,7 @@ from enum import StrEnum, auto
 from .exceptions import ImporterError
 from .models import ImportItem
 from .report import ImportStageReport
+from frayerstore.models.domain_entity import DomainEntity
 
 
 class ImportDecision(StrEnum):
@@ -22,19 +23,15 @@ class IdentityResolutionResult:
 
 def resolve_identity(
     incoming: ImportItem,
-    existing_by_slug: ImportItem | None,
-    existing_by_name: ImportItem | None,
+    existing_by_slug: DomainEntity | None,
+    existing_by_name: DomainEntity | None,
 ) -> IdentityResolutionResult:
     # DOUBLE-COLLLISION (slug row != name row)
-    if (
-        existing_by_slug
-        and existing_by_name
-        and existing_by_name.id != existing_by_slug.id
-    ):
+    if existing_by_slug and existing_by_name and existing_by_name != existing_by_slug:
         message = (
             f"Identity conflict: slug '{incoming.slug}' refers to "
-            f"'{existing_by_slug.name}' (id={existing_by_slug.id}) but name '{incoming.name}' "
-            f"refers to '{existing_by_name.name}' (id={existing_by_name.id})."
+            f"'{existing_by_slug.name}' (pk={existing_by_slug.pk}) but name '{incoming.name}' "
+            f"refers to '{existing_by_name.name}' (pk={existing_by_name.pk})."
         )
         return IdentityResolutionResult(decision=ImportDecision.ERROR, error=message)
 
