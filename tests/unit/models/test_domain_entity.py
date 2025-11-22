@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+
 from frayerstore.models.domain_entity import DomainEntity
 
 
-# Concrete subclasses
 @dataclass(frozen=True)
 class Foo(DomainEntity):
     name: str = "x"
@@ -11,11 +11,6 @@ class Foo(DomainEntity):
 @dataclass(frozen=True)
 class Bar(DomainEntity):
     value: int = 0
-
-
-# ---------------------------------------------------------------------------
-# TESTS
-# ---------------------------------------------------------------------------
 
 
 def test_equal_when_same_type_and_same_pk():
@@ -38,30 +33,32 @@ def test_not_equal_across_subclasses_even_if_same_pk():
     a = Foo(pk=1)
     b = Bar(pk=1)
 
-    assert a != b
+    # should hit "type(other) is not type(self)" branch → NotImplemented → False
     assert (a == b) is False
-    # hash differs because we include type in hash
+    assert (b == a) is False
     assert hash(a) != hash(b)
 
 
 def test_comparison_with_non_domain_entity_returns_not_implemented():
     a = Foo(pk=1)
 
-    # This becomes "False" because Python interprets NotImplemented
+    # a == 123 → NotImplemented → Python resolves that to False
     assert (a == 123) is False
 
 
 def test_hash_is_stable_and_based_on_type_and_pk():
-    a = Foo(pk=42)
+    a1 = Foo(pk=42)
+    a2 = Foo(pk=42)
+    b = Bar(pk=42)
 
-    # Hash is deterministic
-    assert hash(a) == hash(Foo(pk=42))
+    # same type + same pk → same hash
+    assert hash(a1) == hash(a2)
 
-    # And different subclass should produce different hash
-    assert hash(Foo(pk=42)) != hash(Bar(pk=42))
+    # different type + same pk → different hash
+    assert hash(a1) != hash(b)
 
-    # Hash is stable on repeated calls
-    assert hash(a) == hash(a)
+    # stable across calls
+    assert hash(a1) == hash(a1)
 
 
 def test_entities_work_in_sets_and_dicts():
@@ -70,7 +67,7 @@ def test_entities_work_in_sets_and_dicts():
     c = Foo(pk=2)
 
     s = {a, c}
-    assert b in s  # same type + same pk
+    assert b in s
     assert len(s) == 2
 
     d = {a: "hello"}
