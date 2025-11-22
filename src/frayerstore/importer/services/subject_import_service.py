@@ -4,6 +4,7 @@ from frayerstore.importer.report import ImportStageReport
 from frayerstore.importer.dto.import_subject import ImportSubject
 from frayerstore.db.interfaces.subject_repo import SubjectRepository
 from frayerstore.models.subject import Subject
+from frayerstore.models.subject_create import SubjectCreate
 from frayerstore.importer.identity import resolve_identity, handle_resolution
 
 
@@ -47,8 +48,8 @@ class SubjectImportService:
             return existing
 
         # CREATE path
-        candidate = Subject(pk=None, name=incoming.name, slug=incoming.slug)
-        saved = self.repo.save(candidate)
-        stage_report.record_created(saved)
+        candidate = SubjectCreate(name=incoming.name, slug=incoming.slug)
+        created = self.repo.save(candidate)
+        stage_report.record_created(created)
 
-        return saved
+        return created
