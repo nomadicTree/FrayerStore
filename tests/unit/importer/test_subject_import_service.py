@@ -1,6 +1,6 @@
 import pytest
 
-from frayerstore.importer.services.subject_import_service import SubjectImportService
+from frayerstore.importer.services.import_services import SubjectImportService
 from frayerstore.importer.dto.import_subject import ImportSubject
 from frayerstore.importer.report import ImportStageReport
 from frayerstore.importer.exceptions import SubjectImportError
@@ -65,7 +65,7 @@ def test_creates_subject_when_none_exists():
 
     incoming = make_incoming("Computing")
 
-    result = service.import_subject(incoming, report)
+    result = service.import_item(incoming, report)
 
     # repo.create was called
     assert len(repo.created) == 1
