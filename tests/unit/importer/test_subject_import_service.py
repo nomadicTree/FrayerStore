@@ -88,7 +88,7 @@ def test_skips_when_slug_match_exists():
 
     incoming = make_incoming("Computing")
 
-    result = service.import_subject(incoming, report)
+    result = service.import_item(incoming, report)
 
     # Should return the existing one
     assert result is existing
@@ -113,7 +113,7 @@ def test_skips_when_name_match_exists():
     # Incoming has same name -> same slug
     incoming = make_incoming("Computing")
 
-    result = service.import_subject(incoming, report)
+    result = service.import_item(incoming, report)
 
     assert result is existing
     assert report.skipped == [existing]
@@ -136,7 +136,7 @@ def test_error_when_name_conflicts_with_existing_slug():
     incoming = ImportSubject(name="Different Name", slug="computing")
 
     with pytest.raises(SubjectImportError):
-        service.import_subject(incoming, report)
+        service.import_item(incoming, report)
 
     assert len(report.errors) == 1
     assert report.created == []
@@ -158,7 +158,7 @@ def test_error_when_slug_conflicts_with_existing_name():
     incoming = ImportSubject(name="Computing", slug="different-slug")
 
     with pytest.raises(SubjectImportError):
-        service.import_subject(incoming, report)
+        service.import_item(incoming, report)
 
     assert len(report.errors) == 1
     assert report.created == []
@@ -171,7 +171,7 @@ def test_create_called_with_correct_candidate():
     report = ImportStageReport("Subjects")
 
     incoming = make_incoming("Maths")
-    _ = service.import_subject(incoming, report)
+    _ = service.import_item(incoming, report)
 
     assert isinstance(repo.created[0], Subject)
     assert repo.created[0].name == "Maths"
