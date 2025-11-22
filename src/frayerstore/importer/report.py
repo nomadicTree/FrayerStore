@@ -40,6 +40,9 @@ class ImportReport:
     subjects: ImportStageReport = field(
         default_factory=lambda: ImportStageReport("Subjects")
     )
+    levels: ImportStageReport = field(
+        default_factory=lambda: ImportStageReport("Levels")
+    )
     courses: ImportStageReport = field(
         default_factory=lambda: ImportStageReport("Courses")
     )
