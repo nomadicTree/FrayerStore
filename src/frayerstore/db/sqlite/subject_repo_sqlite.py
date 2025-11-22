@@ -1,6 +1,7 @@
 from __future__ import annotations
 import sqlite3
 from frayerstore.models.subject import Subject
+from frayerstore.models.subject_create import SubjectCreate
 from frayerstore.db.interfaces.subject_repo import SubjectRepository
 from frayerstore.db.sqlite.subject_mapper import SubjectMapper
 
@@ -33,12 +34,12 @@ class SQLiteSubjectRepository(SubjectRepository):
         row = self.conn.execute(q, (id,)).fetchone()
         return self.mapper.row_to_domain(row) if row else None
 
-    def save(self, subject: Subject) -> Subject:
-        params = self.mapper.domain_to_params(subject)
+    def create(self, data: SubjectCreate) -> Subject:
+        params = self.mapper.domain_to_params(data)
         q = """
         INSERT INTO Subjects (name, slug)
         VALUES (?, ?)
         RETURNING id, name, slug
         """
-        row = self.conn.execute(q, params)
+        row = self.conn.execute(q, params).fetchone()
         return self.mapper.row_to_domain(row)
