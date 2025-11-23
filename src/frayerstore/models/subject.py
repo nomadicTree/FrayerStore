@@ -1,12 +1,13 @@
-from dataclasses import dataclass
-from .domain_entity import DomainEntity
+from __future__ import annotations
+from dataclasses import dataclass, field
+from frayerstore.models.domain_entity import DomainEntity
+from frayerstore.models.course import Course
 
 
-@dataclass(frozen=True)
+@dataclass(eq=False)
 class Subject(DomainEntity):
-    name: str
-    slug: str
+    courses: list[Course] = field(default_factory=list)
 
     @property
-    def label(self):
+    def label(self) -> str:
         return self.name

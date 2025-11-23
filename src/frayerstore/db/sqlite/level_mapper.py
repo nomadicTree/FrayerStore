@@ -13,3 +13,6 @@ class LevelMapper:
 
     def create_to_params(self, data: LevelCreate) -> tuple:
         return (data.name, data.slug)
+
+    def from_joined_row(self, row: sqlite3.Row) -> Level:
+        return Level(pk=row["level_id"], name=row["level_name"], slug=row["level_slug"])

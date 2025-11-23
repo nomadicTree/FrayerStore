@@ -1,15 +1,15 @@
-from dataclasses import dataclass
+from __future__ import annotations
+from dataclasses import dataclass, field
 from frayerstore.models.domain_entity import DomainEntity
-from frayerstore.models.subject import Subject
 from frayerstore.models.level import Level
+from frayerstore.models.topic import Topic
 
 
-@dataclass(frozen=True, order=False)
+@dataclass(eq=False, order=False)
 class Course(DomainEntity):
-    name: str
-    slug: str
-    subject: Subject
+    subject_pk: int
     level: Level
+    topics: list[Topic] = field(default_factory=list)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Course):

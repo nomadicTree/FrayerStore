@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 
 
-@dataclass(eq=False, frozen=True)
+@dataclass(eq=False)
 class DomainEntity:
     """Base class for all domain entities with database identity."""
 
     pk: int
+    slug: str
+    name: str
 
     def __eq__(self, other: object) -> bool:
         if type(other) is not type(self):

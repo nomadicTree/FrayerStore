@@ -2,8 +2,13 @@ import pytest
 
 from frayerstore.db.sqlite.course_repo_sqlite import SQLiteCourseRepository
 from frayerstore.db.sqlite.course_mapper import CourseMapper
+from frayerstore.db.sqlite.level_mapper import LevelMapper
+from frayerstore.db.sqlite.topic_repo_sqlite import SQLiteTopicRepository
+from frayerstore.db.sqlite.topic_mapper import TopicMapper
 from frayerstore.models.course import Course
 from frayerstore.models.course_create import CourseCreate
+from frayerstore.models.topic import Topic
+from frayerstore.models.topic_create import TopicCreate
 
 
 # ---------------------------------------------------------------------------
@@ -12,16 +17,32 @@ from frayerstore.models.course_create import CourseCreate
 
 
 @pytest.fixture
-def mapper():
-    return CourseMapper()
+def level_mapper():
+    return LevelMapper()
 
 
 @pytest.fixture
-def repo(schema_db, mapper):
-    return SQLiteCourseRepository(schema_db, mapper)
+def course_mapper(level_mapper):
+    return CourseMapper(level_mapper)
+
+
+@pytest.fixture
+def topic_mapper():
+    return TopicMapper()
+
+
+@pytest.fixture
+def topic_repo(schema_db, topic_mapper):
+    return SQLiteTopicRepository(schema_db, topic_mapper)
+
+
+@pytest.fixture
+def repo(schema_db, course_mapper, topic_repo):
+    return SQLiteCourseRepository(schema_db, course_mapper, topic_repo)
 
 
 # Helpers
+
 
 def insert_subject(conn, name="Computing", slug="computing"):
     return conn.execute(
@@ -45,6 +66,24 @@ def insert_course(conn, *, subject_id, level_id, name="Algorithms", slug="algori
         RETURNING id, subject_id, level_id, name, slug
         """,
         (subject_id, level_id, name, slug),
+    ).fetchone()
+
+
+def insert_topic(
+    conn,
+    *,
+    course_id,
+    code="A1",
+    name="Arrays",
+    slug="arrays",
+):
+    return conn.execute(
+        """
+        INSERT INTO Topics (course_id, code, name, slug)
+        VALUES (?, ?, ?, ?)
+        RETURNING id, course_id, code, name, slug
+        """,
+        (course_id, code, name, slug),
     ).fetchone()
 
 
@@ -74,23 +113,25 @@ def test_create_inserts_row_and_returns_domain(schema_db, repo):
     assert isinstance(created, Course)
     assert created.pk == row["id"]
     assert created.subject_pk == subject["id"]
-    assert created.level_pk == level["id"]
+    assert created.level.pk == level["id"]
+    assert created.level.slug == "ks4"
+    assert created.topics == []
 
 
-def test_create_uses_mapper_to_build_params(schema_db, mapper, monkeypatch):
-    repo = SQLiteCourseRepository(schema_db, mapper)
-    insert_subject(schema_db)
-    insert_level(schema_db)
+def test_create_uses_mapper_to_build_params(schema_db, course_mapper, topic_repo, monkeypatch):
+    subject = insert_subject(schema_db)
+    level = insert_level(schema_db)
+    repo = SQLiteCourseRepository(schema_db, course_mapper, topic_repo)
 
     called = {}
 
     def fake_params(data):
         called["used"] = True
-        return (1, 1, "X", "x")
+        return (subject["id"], level["id"], "X", "x")
 
-    monkeypatch.setattr(mapper, "create_to_params", fake_params)
+    monkeypatch.setattr(course_mapper, "create_to_params", fake_params)
 
-    repo.create(CourseCreate(name="X", slug="x", subject_pk=1, level_pk=1))
+    repo.create(CourseCreate(name="X", slug="x", subject_pk=subject["id"], level_pk=level["id"]))
 
     assert called.get("used") is True
 
@@ -100,10 +141,10 @@ def test_create_uses_mapper_to_build_params(schema_db, mapper, monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-def setup_course(conn):
+def setup_course(conn, *, name="Algorithms", slug="algorithms"):
     subject = insert_subject(conn)
     level = insert_level(conn)
-    return insert_course(conn, subject_id=subject["id"], level_id=level["id"])
+    return insert_course(conn, subject_id=subject["id"], level_id=level["id"], name=name, slug=slug)
 
 
 def test_get_by_slug_returns_course(repo, schema_db):
@@ -115,7 +156,8 @@ def test_get_by_slug_returns_course(repo, schema_db):
     assert course.pk == row["id"]
     assert course.name == row["name"]
     assert course.subject_pk == row["subject_id"]
-    assert course.level_pk == row["level_id"]
+    assert course.level.pk == row["level_id"]
+    assert course.topics == []
 
 
 def test_get_by_slug_returns_none_when_missing(repo):
@@ -129,6 +171,7 @@ def test_get_by_name_returns_course(repo, schema_db):
 
     assert isinstance(course, Course)
     assert course.slug == row["slug"]
+    assert course.level.name is not None
 
 
 def test_get_by_name_returns_none_when_missing(repo):
@@ -143,7 +186,32 @@ def test_get_by_id_returns_course(repo, schema_db):
     assert isinstance(course, Course)
     assert course.pk == row["id"]
     assert course.name == row["name"]
+    assert course.level.slug == "ks4"
 
 
 def test_get_by_id_returns_none_when_missing(repo):
     assert repo.get_by_id(9999) is None
+
+
+def test_get_for_subject_returns_courses_sorted_by_name(repo, schema_db):
+    subject = insert_subject(schema_db)
+    level = insert_level(schema_db)
+    insert_course(schema_db, subject_id=subject["id"], level_id=level["id"], name="Zoology", slug="z")
+    insert_course(schema_db, subject_id=subject["id"], level_id=level["id"], name="Algebra", slug="a")
+
+    courses = repo.get_for_subject(subject["id"])
+
+    assert [c.name for c in courses] == ["Algebra", "Zoology"]
+
+
+def test_get_by_id_with_topics_includes_topics_when_requested(repo, schema_db, topic_repo):
+    row = setup_course(schema_db)
+    insert_topic(schema_db, course_id=row["id"], code="A1", name="Arrays", slug="arrays")
+    insert_topic(schema_db, course_id=row["id"], code="A2", name="Loops", slug="loops")
+
+    course = repo.get_by_id(row["id"], include_topics=True)
+
+    assert isinstance(course, Course)
+    assert len(course.topics) == 2
+    assert all(isinstance(t, Topic) for t in course.topics)
+    assert [t.code for t in course.topics] == ["A1", "A2"]
