@@ -1,23 +1,35 @@
 import pytest
 
 from frayerstore.db.sqlite.course_mapper import CourseMapper
+from frayerstore.db.sqlite.level_mapper import LevelMapper
 from frayerstore.models.course import Course
 from frayerstore.models.course_create import CourseCreate
+from frayerstore.models.level import Level
 
 
-def make_row(id=1, subject_id=10, level_id=20, name="Algorithms", slug="algorithms"):
+def make_row(
+    course_id=1,
+    subject_id=10,
+    level_id=20,
+    course_name="Algorithms",
+    course_slug="algorithms",
+    level_name="KS4",
+    level_slug="ks4",
+):
     return {
-        "id": id,
+        "course_id": course_id,
         "subject_id": subject_id,
+        "course_name": course_name,
+        "course_slug": course_slug,
         "level_id": level_id,
-        "name": name,
-        "slug": slug,
+        "level_name": level_name,
+        "level_slug": level_slug,
     }
 
 
 @pytest.fixture
 def mapper():
-    return CourseMapper()
+    return CourseMapper(LevelMapper())
 
 
 # ---------------------------------------------------------------------------
@@ -26,14 +38,15 @@ def mapper():
 
 
 def test_row_to_domain_returns_course(mapper):
-    row = make_row(id=7, subject_id=2, level_id=3, name="Biology", slug="biology")
+    row = make_row(course_id=7, subject_id=2, level_id=3, course_name="Biology", course_slug="biology")
 
     course = mapper.row_to_domain(row)
 
     assert isinstance(course, Course)
     assert course.pk == 7
     assert course.subject_pk == 2
-    assert course.level_pk == 3
+    assert isinstance(course.level, Level)
+    assert course.level.pk == 3
     assert course.name == "Biology"
     assert course.slug == "biology"
 

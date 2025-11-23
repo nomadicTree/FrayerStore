@@ -1,15 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from frayerstore.models.domain_entity import DomainEntity
 
 
-@dataclass(frozen=True)
+@dataclass(eq=False)
 class Foo(DomainEntity):
+    slug: str = "foo"
     name: str = "x"
 
 
-@dataclass(frozen=True)
+@dataclass(eq=False)
 class Bar(DomainEntity):
+    slug: str = "bar"
+    name: str = "bar"
     value: int = 0
 
 
